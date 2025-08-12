@@ -15,6 +15,7 @@ uv run streamlit run streamlit/streamlit_app.py
 uv run gradio gradio/gradio_app.py
 uv run shiny run --reload -h 0.0.0.0 shiny/app.py
 uv run panel serve --dev panel/panel_app.py
+uv run nicegui/nicegui_app.py
 ```
 
 Inspiration: <https://stevenponce.netlify.app/data_visualizations/TidyTuesday/2025/tt_2025_30.html>
