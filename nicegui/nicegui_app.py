@@ -5,9 +5,9 @@ from python_webapp_comparison import get_periods
 from python_webapp_comparison import plot_velocity_plotly
 from python_webapp_comparison import preview_data
 
-from nicegui import ui
-from nicegui import html
 from nicegui import binding
+from nicegui import html
+from nicegui import ui
 
 
 class Filters:
