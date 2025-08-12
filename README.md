@@ -1,5 +1,7 @@
 # Trying out all Python Data Web Frameworks
 
+![](./images/streamlit.PNG)
+
 ```sh
 # Build .venv environment
 uv sync
