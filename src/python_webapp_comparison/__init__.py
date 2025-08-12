@@ -1,4 +1,5 @@
 from datetime import date
+from typing import List
 
 import plotly.express as px
 import polars as pl
@@ -98,6 +99,13 @@ _data = __load_data()
 
 def get_data():
     return _data.clone()
+
+
+def preview_data(period: str, titles: List[str]):
+    return _data.filter(
+        pl.col("report") == period,
+        pl.col("title").is_in(titles),
+    )
 
 
 def get_periods():

@@ -1,15 +1,13 @@
-from python_webapp_comparison import get_data
 from python_webapp_comparison import get_hours_watch
 from python_webapp_comparison import get_num_elements
 from python_webapp_comparison import get_num_views
 from python_webapp_comparison import get_periods
 from python_webapp_comparison import plot_velocity
+from python_webapp_comparison import preview_data
 
 import streamlit as st
 
 st.set_page_config(page_title="Movie Analytics", layout="wide")
-
-df = get_data()
 
 app = st.container(gap="medium")
 
@@ -48,14 +46,21 @@ with app.container(horizontal=True):
         border=True,
     )
 
-with app.container(horizontal=True):
-    chart_container = st.container()
-    detail_container = st.container(width=400)
-
-with chart_container:
+with app.container():
     fig = plot_velocity(selected_period, selected_content_type)
-    st.plotly_chart(
+    selected_points = st.plotly_chart(
         fig,
+        on_select="rerun",
+        selection_mode="lasso",
     )
+    selected_titles = [p["hovertext"] for p in selected_points["selection"]["points"]]
 
-app.dataframe(df)
+preview_data = preview_data(selected_period, selected_titles)
+
+if preview_data.is_empty():
+    st.info(
+        "Lasso select titles (25 max) to see detail", width=400, icon=":material/info:"
+    )
+else:
+    with app.container():
+        st.dataframe(preview_data)
