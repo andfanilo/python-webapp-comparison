@@ -1,6 +1,7 @@
 from datetime import date
 from typing import List
 
+import altair as alt
 import plotly.express as px
 import polars as pl
 
@@ -152,13 +153,14 @@ def get_hours_watch(period: str, content_type: str):
     return n_views
 
 
-def plot_velocity(period: str, content_type: str):
+def plot_velocity_plotly(period: str, content_type: str):
+    d = _data.filter(
+        pl.col("mean_views_per_day").is_not_null(),
+        pl.col("report") == period,
+        pl.col("type") == content_type,
+    )
     fig = px.scatter(
-        _data.filter(
-            pl.col("mean_views_per_day").is_not_null(),
-            pl.col("report") == period,
-            pl.col("type") == content_type,
-        ),
+        d,
         x="days_since_release",
         y="mean_views_per_day",
         title="Show Velocity",
@@ -173,6 +175,37 @@ def plot_velocity(period: str, content_type: str):
         yaxis_type="log",
     )
     return fig
+
+
+def plot_velocity_altair(period: str, content_type: str):
+    d = _data.filter(
+        pl.col("days_since_release").is_not_null(),
+        pl.col("mean_views_per_day").is_not_null(),
+        pl.col("report") == period,
+        pl.col("type") == content_type,
+    )
+    chart = alt.Chart(d).mark_circle().encode(
+        x=alt.X(
+            "days_since_release",
+            title="Days Since Release",
+            type='quantitative',
+        ),
+        y=alt.Y(
+            "mean_views_per_day",
+            title="Mean Views per Day",
+            scale=alt.Scale(type="log"), 
+            type='quantitative',
+        ),
+        tooltip=[
+            alt.Tooltip('title', title='Title'),
+            alt.Tooltip('days_since_release', title='Days Since Release'),
+            alt.Tooltip('mean_views_per_day', title='Mean Views per Day', format=".2f") # Format for readability
+        ],
+    ).properties(
+        title="Show Velocity"
+    ).interactive()
+
+    return chart
 
 
 def plot_detail_per_titles(titles):

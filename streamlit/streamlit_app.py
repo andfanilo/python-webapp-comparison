@@ -2,7 +2,7 @@ from python_webapp_comparison import get_hours_watch
 from python_webapp_comparison import get_num_elements
 from python_webapp_comparison import get_num_views
 from python_webapp_comparison import get_periods
-from python_webapp_comparison import plot_velocity
+from python_webapp_comparison import plot_velocity_plotly
 from python_webapp_comparison import preview_data
 
 import streamlit as st
@@ -47,7 +47,7 @@ with app.container(horizontal=True):
     )
 
 with app.container():
-    fig = plot_velocity(selected_period, selected_content_type)
+    fig = plot_velocity_plotly(selected_period, selected_content_type)
     selected_points = st.plotly_chart(
         fig,
         on_select="rerun",
