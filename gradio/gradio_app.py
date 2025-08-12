@@ -1,11 +1,11 @@
 from python_webapp_comparison import get_data
 from python_webapp_comparison import get_hours_watch
-from python_webapp_comparison import get_num_movies
+from python_webapp_comparison import get_num_elements
 from python_webapp_comparison import get_num_shows
 from python_webapp_comparison import get_num_views
 from python_webapp_comparison import get_periods
 from python_webapp_comparison import plot_detail_per_titles
-from python_webapp_comparison import plot_top_show_hours
+from python_webapp_comparison import plot_velocity
 
 import polars as pl
 import gradio as gr
@@ -53,7 +53,7 @@ with gr.Blocks(css=css) as demo:
     with gr.Row():
         with gr.Column(elem_classes="card"):
             gr.Markdown("### Movies")
-            gr.Markdown(f"{get_num_movies(selected_period.value)}")
+            gr.Markdown(f"{get_num_elements(selected_period.value)}")
         with gr.Column():
             gr.Markdown("### Shows")
             gr.Markdown(f"{get_num_shows(selected_period.value)}")

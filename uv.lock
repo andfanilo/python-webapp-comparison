@@ -142,6 +142,20 @@ wheels = [
 ]
 
 [[package]]
+name = "anywidget"
+version = "0.9.18"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "ipywidgets" },
+    { name = "psygnal" },
+    { name = "typing-extensions" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/ed/69/20423d6abd2a57d767d20a9dcf3f816bd4cbbe4813ac7c7158ba16e44c3f/anywidget-0.9.18.tar.gz", hash = "sha256:262cf459b517a7d044d6fbc84b953e9c83f026790b2dd3ce90f21a7f8eded00f", size = 9808509, upload-time = "2025-03-23T20:01:22.358Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/2b/f0/09a30ca0551af20c7cefa7464b7ccb6f5407a550b83c4dcb15c410814849/anywidget-0.9.18-py3-none-any.whl", hash = "sha256:944b82ef1dd17b8ff0fb6d1f199f613caf9111338e6e2857da478f6e73770cb8", size = 220671, upload-time = "2025-03-23T20:01:21.057Z" },
+]
+
+[[package]]
 name = "appdirs"
 version = "1.4.4"
 source = { registry = "https://pypi.org/simple" }
@@ -2162,6 +2176,25 @@ wheels = [
 ]
 
 [[package]]
+name = "psygnal"
+version = "0.14.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/2b/c7/ee9108e587dbbc87fddcc9b971975b3371930a0059d3696d5733469e8989/psygnal-0.14.0.tar.gz", hash = "sha256:bdd219217d240611af31621a6701505256e245abb6e0dc86d7e4443c3f7d6d41", size = 121999, upload-time = "2025-07-01T19:57:39.479Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/13/95/b31f7c4493bdde9dc5caca48a0b2bb0ba1c1784459cef2f38d570561ebee/psygnal-0.14.0-cp312-cp312-macosx_10_13_x86_64.whl", hash = "sha256:08f3867a1f1b0952403ee492482823600ae26d79fa2b57be273f31559d70dfb9", size = 514648, upload-time = "2025-07-01T19:57:17.357Z" },
+    { url = "https://files.pythonhosted.org/packages/6e/38/8428f77237fb3fe67312ff22658de4c74000391d1b58fd8c041da2d77854/psygnal-0.14.0-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:5055400f031ea9c54cb5f0ec272d8172386a0868242f86540cb675cfb4c82298", size = 471455, upload-time = "2025-07-01T19:57:18.547Z" },
+    { url = "https://files.pythonhosted.org/packages/6a/aa/b22c1ee65e5efb7bd5fad296440654330f6e8e04243200ce30eecf566031/psygnal-0.14.0-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:59a47acd9b0c516885a4211339f5bf8a9f43916f1c01799513c16b7b2fee704f", size = 869495, upload-time = "2025-07-01T19:57:20.213Z" },
+    { url = "https://files.pythonhosted.org/packages/a1/0e/0d1b4d6d3affd0ee1407f51d1272e6bb33d34f99ac4dedf2c4460b33c5cb/psygnal-0.14.0-cp312-cp312-musllinux_1_2_x86_64.whl", hash = "sha256:49f6441d157260f1e8a5c843875b79bc9cd5008c2a5ac77a979f25f7cba769e3", size = 862696, upload-time = "2025-07-01T19:57:21.571Z" },
+    { url = "https://files.pythonhosted.org/packages/0c/2b/0a301152a86d3ff2bc444523c652ffe0bb0e6746d3c0e6ffc0fd8269b817/psygnal-0.14.0-cp312-cp312-win_amd64.whl", hash = "sha256:d7f7ff9f64d6c514cd7eba863314329a953d9a2ae16f13226df812199f3c5a74", size = 415722, upload-time = "2025-07-01T19:57:22.8Z" },
+    { url = "https://files.pythonhosted.org/packages/46/9c/80c79f7d0fc0887857f05cac11ae62097b0be83fe0f608adf9edbceed5bc/psygnal-0.14.0-cp313-cp313-macosx_10_13_x86_64.whl", hash = "sha256:7d580a96d2326a72582d217756477d0302e02418ed319142a4f9a94f408ade40", size = 513698, upload-time = "2025-07-01T19:57:24.07Z" },
+    { url = "https://files.pythonhosted.org/packages/c0/03/63f8d51206fd6762f4ea3ca466d08e32836b39995c07949808921884a693/psygnal-0.14.0-cp313-cp313-macosx_11_0_arm64.whl", hash = "sha256:7ffa20c31461d6651861a2aa3df8b28ad4a750e98595119d08efa5e212d02c8a", size = 470780, upload-time = "2025-07-01T19:57:25.759Z" },
+    { url = "https://files.pythonhosted.org/packages/55/4b/4b7c469a16edd5ee22ab8b7559613e392600bc543e13931b05b9bfc03da7/psygnal-0.14.0-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:fb84461e14c73ee08b7aadf6ee6c9744155c88f9b13848b1e6d4ca0eb80ebc44", size = 866202, upload-time = "2025-07-01T19:57:27.209Z" },
+    { url = "https://files.pythonhosted.org/packages/e0/83/e9d7a970bee3080bfb9ffac061ab6de8d17f11d946ca1aade94c6f3a571b/psygnal-0.14.0-cp313-cp313-musllinux_1_2_x86_64.whl", hash = "sha256:b225bbc546a25a7bc427c8e8b1792647c8457475754048134d5a8a0e982d225e", size = 858963, upload-time = "2025-07-01T19:57:28.811Z" },
+    { url = "https://files.pythonhosted.org/packages/68/bf/e29ad79e905368a926e36f7fc5a88ba54d9129fadf66266029e8d3d02ee1/psygnal-0.14.0-cp313-cp313-win_amd64.whl", hash = "sha256:b9a102e4e2a531a7646f3aecee747b6181355272700340827fc86ee4f5028a29", size = 416364, upload-time = "2025-07-01T19:57:30.449Z" },
+    { url = "https://files.pythonhosted.org/packages/32/54/73887f18105faf343b8d3c51952e5d4bc478806d848f0171aac942b6394e/psygnal-0.14.0-py3-none-any.whl", hash = "sha256:2f9011348b923283f13c8b2bca5ffcd6f6c6b5d06954d7e6953a8bbcf62ff4b6", size = 88997, upload-time = "2025-07-01T19:57:38.464Z" },
+]
+
+[[package]]
 name = "ptyprocess"
 version = "0.7.0"
 source = { registry = "https://pypi.org/simple" }
@@ -2471,6 +2504,7 @@ dependencies = [
     { name = "python-fasthtml" },
     { name = "reflex" },
     { name = "shiny" },
+    { name = "shinywidgets" },
     { name = "solara" },
     { name = "streamlit" },
     { name = "watchfiles" },
@@ -2490,6 +2524,7 @@ requires-dist = [
     { name = "python-fasthtml", specifier = ">=0.12.24" },
     { name = "reflex", specifier = ">=0.8.6" },
     { name = "shiny", specifier = ">=1.4.0" },
+    { name = "shinywidgets", specifier = ">=0.7.0" },
     { name = "solara", specifier = ">=1.51.0" },
     { name = "streamlit", specifier = ">=1.48.0" },
     { name = "watchfiles", specifier = ">=1.1.0" },
@@ -2944,6 +2979,22 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/6b/dc/1f1da052f0af709ee73dc07ef12f4c5395eff861e430143ae115fabdc3bb/shiny-1.4.0.tar.gz", hash = "sha256:05c709c2a074b9e9f5a82065460815ff40bc686286bacfcab5195a69f3ae759b", size = 4837146, upload-time = "2025-04-08T16:49:45.406Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/f5/e8/ae54ce930d965211c77b28a8c3792f78a80ad1bd012bbb05000176dd246c/shiny-1.4.0-py3-none-any.whl", hash = "sha256:c7748d0cd32696477613b9c00664320ea1604b9d9770a2ec2e8ea7ea5e0b44b4", size = 3870396, upload-time = "2025-04-08T16:49:43.516Z" },
+]
+
+[[package]]
+name = "shinywidgets"
+version = "0.7.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "anywidget" },
+    { name = "ipywidgets" },
+    { name = "jupyter-core" },
+    { name = "python-dateutil" },
+    { name = "shiny" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/58/4c/cfa9d3c4160ea33142c12cbf98a02af7cd21d19a59cf1fd0a97d59e4b4da/shinywidgets-0.7.0.tar.gz", hash = "sha256:119aac8e45e7b462e6c4b9b7feec7e4920d1594ead1047be4f46d25e7aee50a0", size = 1807583, upload-time = "2025-07-14T22:31:19.746Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/e3/f5/8742ef796d6d824f4952d8a2d791b6f73e93eb635f11eff8606b8448b92e/shinywidgets-0.7.0-py3-none-any.whl", hash = "sha256:d0daf0c575c559c569191c56e74fbec80ef7ec343d89aff127d9baad78e878e9", size = 1816462, upload-time = "2025-07-14T22:31:17.897Z" },
 ]
 
 [[package]]

@@ -13,5 +13,7 @@ uv run pydytuesday tt-download 2025-07-29
 # Run apps
 uv run streamlit run streamlit/streamlit_app.py
 uv run gradio gradio/gradio_app.py
+uv run shiny run --reload -h 0.0.0.0 shiny/app_express.py
 ```
 
+Inspiration: <https://stevenponce.netlify.app/data_visualizations/TidyTuesday/2025/tt_2025_30.html>

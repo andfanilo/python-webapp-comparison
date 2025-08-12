@@ -1,3 +1,5 @@
+from datetime import date
+
 import plotly.express as px
 import polars as pl
 
@@ -21,11 +23,39 @@ def __load_data():
 
     df = shows.vstack(movies)
 
-    df = df.with_columns(
-        pl.col("available_globally").replace("Yes", 1).replace("No", 0),
-    ).with_columns(
-        pl.col("views").fill_null(0),
-        pl.col("hours_viewed").fill_null(0),
+    df = (
+        df.with_columns(
+            pl.col("report").str.replace(r"^(\d{4})([A-Za-z0-9-]+)$", r"${1} - ${2}"),
+            pl.col("available_globally").replace("Yes", 1).replace("No", 0),
+            pl.col("views").fill_null(0),
+            pl.col("hours_viewed").fill_null(0),
+        )
+        .with_columns(
+            pl.col("report")
+            .map_elements(
+                lambda r: {
+                    "2025 - Jan-Jun": date(2025, 6, 30),
+                    "2024 - Jul-Dec": date(2024, 12, 31),
+                    "2024 - Jan-Jun": date(2024, 6, 30),
+                    "2023 - Jul-Dec": date(2023, 12, 31),
+                }.get(r, None),
+                return_dtype=pl.Date,
+            )
+            .alias("last_report_date")
+        )
+        .with_columns(
+            (
+                pl.col("last_report_date")
+                - pl.col("release_date").str.to_date(strict=False)
+            )
+            .dt.total_days()
+            .alias("days_since_release"),
+        )
+        .with_columns(
+            (pl.col("views") / pl.col("days_since_release"))
+            .floor()
+            .alias("mean_views_per_day"),
+        )
     )
 
     df = (
@@ -74,11 +104,11 @@ def get_periods():
     return _data.get_column("report").unique().sort(descending=True)
 
 
-def get_num_movies(period: str = "2025Jan-Jun"):
+def get_num_elements(period: str, content_type: str):
     n_movies = (
         _data.filter(
-            pl.col("type") == "movie",
             pl.col("report") == period,
+            pl.col("type") == content_type,
         )
         .unique(pl.col("title"))
         .height
@@ -86,23 +116,12 @@ def get_num_movies(period: str = "2025Jan-Jun"):
     return n_movies
 
 
-def get_num_shows(period: str = "2025Jan-Jun"):
-    n_shows = (
-        _data.filter(
-            pl.col("type") == "show",
-            pl.col("report") == period,
-        )
-        .unique(pl.col("title"))
-        .height
-    )
-    return n_shows
-
-
-def get_num_views(period: str = "2025Jan-Jun"):
+def get_num_views(period: str, content_type: str):
     n_views = f"{
         (
             _data.filter(
                 pl.col('report') == period,
+                pl.col('type') == content_type,
             )
             .get_column('views')
             .sum()
@@ -111,11 +130,12 @@ def get_num_views(period: str = "2025Jan-Jun"):
     return n_views
 
 
-def get_hours_watch(period: str = "2025Jan-Jun"):
+def get_hours_watch(period: str, content_type: str):
     n_views = f"{
         (
             _data.filter(
                 pl.col('report') == period,
+                pl.col('type') == content_type,
             )
             .get_column('hours_viewed')
             .sum()
@@ -124,40 +144,26 @@ def get_hours_watch(period: str = "2025Jan-Jun"):
     return n_views
 
 
-def plot_top_show_hours(period: str = "2025Jan-Jun"):
-    max_char_limit = 25
-    top_15_shows = (
+def plot_velocity(period: str, content_type: str):
+    fig = px.scatter(
         _data.filter(
+            pl.col("mean_views_per_day").is_not_null(),
             pl.col("report") == period,
-        )
-        .with_columns(
-            pl.col("title")
-            .map_elements(
-                lambda s: (s[:max_char_limit] + "...")
-                if len(s) > max_char_limit
-                else s,
-                return_dtype=pl.String,
-            )
-            .alias("truncated_title"),
-        )
-        .sort(
-            "hours_viewed",
-            descending=True,
-        )
-        .head(15)
-    )
-
-    fig = px.bar(
-        top_15_shows,
-        x="hours_viewed",
-        y="truncated_title",
-        orientation="h",
-        title="Top 10 Shows by Hours Watch",
-        labels={"hours_viewed": "Hours Watched", "truncated_title": "Show Title"},
+            pl.col("type") == content_type,
+        ),
+        x="days_since_release",
+        y="mean_views_per_day",
+        title="Show Velocity",
         hover_name="title",
+        labels={
+            "days_since_release": "Days Since Release",
+            "mean_views_per_day": "Mean Views per Day",
+        },
         height=550,
     )
-    fig.update_layout(yaxis={"categoryorder": "total ascending"})
+    fig.update_layout(
+        yaxis_type="log",
+    )
     return fig
 
 

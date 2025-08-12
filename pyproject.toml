@@ -20,6 +20,7 @@ dependencies = [
     "python-fasthtml>=0.12.24",
     "reflex>=0.8.6",
     "shiny>=1.4.0",
+    "shinywidgets>=0.7.0",
     "solara>=1.51.0",
     "streamlit>=1.48.0",
     "watchfiles>=1.1.0",
