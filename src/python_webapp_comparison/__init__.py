@@ -165,6 +165,7 @@ def plot_velocity_plotly(period: str, content_type: str):
         y="mean_views_per_day",
         title="Show Velocity",
         hover_name="title",
+        custom_data=["title"],
         labels={
             "days_since_release": "Days Since Release",
             "mean_views_per_day": "Mean Views per Day",
