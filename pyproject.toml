@@ -1,8 +1,11 @@
 [project]
-name = "sandbox"
+name = "python-webapp-comparison"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
+authors = [
+    { name = "Fanilo Andrianasolo", email = "contact@andfanilo.com" }
+]
 requires-python = ">=3.12"
 dependencies = [
     "dash>=3.2.0",
@@ -11,6 +14,8 @@ dependencies = [
     "nicegui>=2.22.2",
     "panel>=1.7.5",
     "plotly>=6.2.0",
+    "polars>=1.32.2",
+    "pydytuesday>=0.1.2",
     "pylance>=0.26.1",
     "python-fasthtml>=0.12.24",
     "reflex>=0.8.6",
@@ -19,3 +24,7 @@ dependencies = [
     "streamlit>=1.48.0",
     "watchfiles>=1.1.0",
 ]
+
+[build-system]
+requires = ["uv_build>=0.8.2,<0.9.0"]
+build-backend = "uv_build"

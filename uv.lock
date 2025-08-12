@@ -2041,6 +2041,20 @@ wheels = [
 ]
 
 [[package]]
+name = "polars"
+version = "1.32.2"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/8a/07/7864688644139b1bc198c36e34e81581ec76c8d20ae57c4879914786b2a1/polars-1.32.2.tar.gz", hash = "sha256:b4c5cefc7cf7a2461f8800cf2c09976c47cb1fd959c6ef3024d5618b497f05d3", size = 4788876, upload-time = "2025-08-07T10:51:16.587Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/f5/61/b251ce6755d0d3c6f4c8cb245941b80901624fce7efeb95b37c170da2565/polars-1.32.2-cp39-abi3-macosx_10_12_x86_64.whl", hash = "sha256:f21da6a5210898ec800b7e9e667fb53eb9161b7ceb812ee6555ff5661a00e517", size = 37770199, upload-time = "2025-08-07T10:50:05.627Z" },
+    { url = "https://files.pythonhosted.org/packages/22/74/ea073a88073cd6025b12850484f51d30dad695b51432a3f0a0439e2f8094/polars-1.32.2-cp39-abi3-macosx_11_0_arm64.whl", hash = "sha256:d3f4e061312ef6c2a907378ce407a6132734fe1a13f261a1984a1a9ca2f6febc", size = 34461798, upload-time = "2025-08-07T10:50:10.452Z" },
+    { url = "https://files.pythonhosted.org/packages/ec/14/ee34ebe3eb842c83ca1d2d3af6ee02b08377e056ffad156c9a2b15a6d05c/polars-1.32.2-cp39-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:a711a750cfc19f1f883d2b46895dd698abf4d446ca41c3bf510ced0ff1178057", size = 38280883, upload-time = "2025-08-07T10:50:14.168Z" },
+    { url = "https://files.pythonhosted.org/packages/af/ed/0f5ab777b0dc95936074266bc6fd9cf117886ebdd6685589437edfdbb186/polars-1.32.2-cp39-abi3-manylinux_2_24_aarch64.whl", hash = "sha256:d1c53a828eedc215fb0dabc7cef02c6f4ad042157512ddb99840fd42b8da1e8a", size = 35490843, upload-time = "2025-08-07T10:50:18.325Z" },
+    { url = "https://files.pythonhosted.org/packages/91/58/d2840554ef1c69e06a28ee928bdaa0d6a61af12205ff24c096628f217f99/polars-1.32.2-cp39-abi3-win_amd64.whl", hash = "sha256:5e1660a584e89e1d60cd89984feca38a695e491a966581fefe8be99c230ea154", size = 37897347, upload-time = "2025-08-07T10:50:22.247Z" },
+    { url = "https://files.pythonhosted.org/packages/b8/53/4eaaa4f219add46594db21a05a9a5629ec6af20bd859a90668d5a1448abc/polars-1.32.2-cp39-abi3-win_arm64.whl", hash = "sha256:cd390364f6f3927474bd0aed255103195b9d2b3eef0f0c5bb429db5e6311615e", size = 34059100, upload-time = "2025-08-07T10:50:26.445Z" },
+]
+
+[[package]]
 name = "prompt-toolkit"
 version = "3.0.51"
 source = { registry = "https://pypi.org/simple" }
@@ -2283,6 +2297,22 @@ wheels = [
 ]
 
 [[package]]
+name = "pydytuesday"
+version = "0.1.2"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "beautifulsoup4" },
+    { name = "markdown" },
+    { name = "pandas" },
+    { name = "pytz" },
+    { name = "requests" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/dd/6a/fdb7736b99b6170c9110dbd2b7e98233c33ffbd6dc009fb4a08963f266ec/pydytuesday-0.1.2.tar.gz", hash = "sha256:13aa0e528f0a3588dbceb1badc85cdd1d38049332f7341d95d6f420210dc6b67", size = 28115, upload-time = "2025-03-17T22:59:51.174Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/1e/22/3942c5330a402453ca11b2a148a5a207a9b6c76201e97954f782797d6473/pydytuesday-0.1.2-py3-none-any.whl", hash = "sha256:07d956a0017dfa22b0c80ef3b4250147e27273ce81c32ea611fc02be8c523ded", size = 11344, upload-time = "2025-03-17T22:59:50.048Z" },
+]
+
+[[package]]
 name = "pygments"
 version = "2.19.2"
 source = { registry = "https://pypi.org/simple" }
@@ -2422,6 +2452,47 @@ wheels = [
 [package.optional-dependencies]
 asyncio-client = [
     { name = "aiohttp" },
+]
+
+[[package]]
+name = "python-webapp-comparison"
+version = "0.1.0"
+source = { editable = "." }
+dependencies = [
+    { name = "dash" },
+    { name = "flet", extra = ["all"] },
+    { name = "gradio" },
+    { name = "nicegui" },
+    { name = "panel" },
+    { name = "plotly" },
+    { name = "polars" },
+    { name = "pydytuesday" },
+    { name = "pylance" },
+    { name = "python-fasthtml" },
+    { name = "reflex" },
+    { name = "shiny" },
+    { name = "solara" },
+    { name = "streamlit" },
+    { name = "watchfiles" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "dash", specifier = ">=3.2.0" },
+    { name = "flet", extras = ["all"], specifier = ">=0.28.3" },
+    { name = "gradio", specifier = ">=5.42.0" },
+    { name = "nicegui", specifier = ">=2.22.2" },
+    { name = "panel", specifier = ">=1.7.5" },
+    { name = "plotly", specifier = ">=6.2.0" },
+    { name = "polars", specifier = ">=1.32.2" },
+    { name = "pydytuesday", specifier = ">=0.1.2" },
+    { name = "pylance", specifier = ">=0.26.1" },
+    { name = "python-fasthtml", specifier = ">=0.12.24" },
+    { name = "reflex", specifier = ">=0.8.6" },
+    { name = "shiny", specifier = ">=1.4.0" },
+    { name = "solara", specifier = ">=1.51.0" },
+    { name = "streamlit", specifier = ">=1.48.0" },
+    { name = "watchfiles", specifier = ">=1.1.0" },
 ]
 
 [[package]]
@@ -2816,43 +2887,6 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/67/4c/19db75e6405692b2a96af8f06d1258f8aa7290bdc35ac966f03e207f6d7f/safehttpx-0.1.6.tar.gz", hash = "sha256:b356bfc82cee3a24c395b94a2dbeabbed60aff1aa5fa3b5fe97c4f2456ebce42", size = 9987, upload-time = "2024-12-02T18:44:10.226Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/4d/c0/1108ad9f01567f66b3154063605b350b69c3c9366732e09e45f9fd0d1deb/safehttpx-0.1.6-py3-none-any.whl", hash = "sha256:407cff0b410b071623087c63dd2080c3b44dc076888d8c5823c00d1e58cb381c", size = 8692, upload-time = "2024-12-02T18:44:08.555Z" },
-]
-
-[[package]]
-name = "sandbox"
-version = "0.1.0"
-source = { virtual = "." }
-dependencies = [
-    { name = "dash" },
-    { name = "flet", extra = ["all"] },
-    { name = "gradio" },
-    { name = "nicegui" },
-    { name = "panel" },
-    { name = "plotly" },
-    { name = "pylance" },
-    { name = "python-fasthtml" },
-    { name = "reflex" },
-    { name = "shiny" },
-    { name = "solara" },
-    { name = "streamlit" },
-    { name = "watchfiles" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "dash", specifier = ">=3.2.0" },
-    { name = "flet", extras = ["all"], specifier = ">=0.28.3" },
-    { name = "gradio", specifier = ">=5.42.0" },
-    { name = "nicegui", specifier = ">=2.22.2" },
-    { name = "panel", specifier = ">=1.7.5" },
-    { name = "plotly", specifier = ">=6.2.0" },
-    { name = "pylance", specifier = ">=0.26.1" },
-    { name = "python-fasthtml", specifier = ">=0.12.24" },
-    { name = "reflex", specifier = ">=0.8.6" },
-    { name = "shiny", specifier = ">=1.4.0" },
-    { name = "solara", specifier = ">=1.51.0" },
-    { name = "streamlit", specifier = ">=1.48.0" },
-    { name = "watchfiles", specifier = ">=1.1.0" },
 ]
 
 [[package]]

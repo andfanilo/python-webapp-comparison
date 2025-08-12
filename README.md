@@ -1,7 +1,14 @@
 # Trying out all Python Data Web Frameworks
 
 ```sh
+# Build .venv environment
 uv sync
-uv run <command>
+
+# Download data
+cd data
+uv run pydytuesday tt-download 2025-07-29
+
+# Run apps
+uv run streamlit run streamlit/streamlit_app.py
 ```
 
