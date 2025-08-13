@@ -1,7 +1,6 @@
 from datetime import date
 from typing import List
 
-import altair as alt
 import plotly.express as px
 import polars as pl
 
@@ -102,9 +101,10 @@ def get_data():
     return _data.clone()
 
 
-def preview_data(period: str, titles: List[str]):
+def preview_data(period: str, content_type: str, titles: List[str]):
     preview = _data.filter(
         pl.col("report") == period,
+        pl.col("type") == content_type,
     )
     if titles and len(titles) > 0:
         preview = preview.filter(pl.col("title").is_in(titles))

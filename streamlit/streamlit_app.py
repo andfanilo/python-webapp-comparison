@@ -60,14 +60,15 @@ with chart_row:
         fig,
         on_select="rerun",
         selection_mode="lasso",
+        key="plotly_chart",
     )
     selected_titles = [p["hovertext"] for p in selected_points["selection"]["points"]]
 
-preview_data = preview_data(selected_period, selected_titles)
+data_preview = preview_data(selected_period, selected_content_type, selected_titles)
 
-if preview_data.is_empty():
+if data_preview.is_empty():
     st.info(
         "Lasso select titles (25 max) to see detail", width=400, icon=":material/info:"
     )
 else:
-    preview_row.dataframe(preview_data)
+    preview_row.dataframe(data_preview)

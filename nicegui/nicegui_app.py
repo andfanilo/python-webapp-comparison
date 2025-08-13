@@ -22,6 +22,36 @@ class Filters:
         self.selected_titles = titles
 
 
+def build_plot(filters: Filters):
+    fig = plot_velocity_plotly(
+        filters.selected_period,
+        filters.selected_content_type,
+    )
+    fig.update_layout(
+        template="plotly_white",
+    )
+    return fig
+
+
+def plotly_event_callback(titles: List[str], filters: Filters, data_preview_widget):
+    filters.selected_titles = titles
+    update_data_preview(filters, data_preview_widget)
+
+
+def update_data_preview(filters: Filters, data_preview_widget):
+    df = preview_data(
+        filters.selected_period,
+        filters.selected_content_type,
+        filters.selected_titles,
+    ).to_dicts()
+    data_preview_widget.options["rowData"] = df
+    data_preview_widget.update()
+
+
+def update_graph(filters: Filters, graph_widget):
+    graph_widget.update_figure(build_plot(filters))
+
+
 def card(title, reactive_title, fn_value):
     with ui.card().classes("flex-1"):
         with ui.card_section():
@@ -102,47 +132,40 @@ with card_row:
     card("Hours Watched", None, get_hours_watch)
 
 
-def build_plot(filt):
-    fig = plot_velocity_plotly(
-        filt.selected_period,
-        filt.selected_content_type,
-    )
-    fig.update_layout(
-        template="plotly_white",
-    )
-    return fig
-
-
 with chart_row:
     plotly_chart = ui.plotly(build_plot(filters))
     plotly_chart.classes("w-full")
-    period_input.on(
-        "update:model-value", lambda _: plotly_chart.update_figure(build_plot(filters))
-    )
-    content_type_input.on(
-        "update:model-value", lambda _: plotly_chart.update_figure(build_plot(filters))
-    )
-
-    # ON Event: https://github.com/zauberzeug/nicegui/issues/3762
-    plotly_chart.on(
-        "plotly_selected",
-        lambda e: ui.notify(e.args),
-        js_handler="(event) => emit(event.points.map(point => point.customdata).flat())",
-    ).on(
-        "plotly_deselect",
-        lambda _: ui.notify("Byebye"),
-    ).on(
-        "plotly_doubleclick",
-        lambda _: ui.notify("Byebye"),
-    )
 
 
 with preview_row:
     data_preview = preview_data(
         filters.selected_period,
+        filters.selected_content_type,
         filters.selected_titles,
     )
     data_output = ui.aggrid.from_polars(data_preview)
+
+
+# Only changes titles and data preview
+# ON Event: https://github.com/zauberzeug/nicegui/issues/3762
+plotly_chart.on(
+    "plotly_selected",
+    lambda e: plotly_event_callback(e.args, filters, data_output),
+    js_handler="(event) => emit(event.points.map(point => point.customdata).flat())",
+).on(
+    "plotly_deselect",
+    lambda _: plotly_event_callback([], filters, data_output),
+).on(
+    "plotly_doubleclick",
+    lambda _: plotly_event_callback([], filters, data_output),
+)
+
+period_input.on("update:model-value", lambda _: update_graph(filters, plotly_chart)).on(
+    "update:model-value", lambda _: update_data_preview(filters, data_output)
+)
+content_type_input.on(
+    "update:model-value", lambda _: update_graph(filters, plotly_chart)
+).on("update:model-value", lambda _: update_data_preview(filters, data_output))
 
 if __name__ in {"__main__", "__mp_main__"}:
     ui.run()

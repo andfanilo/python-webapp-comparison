@@ -149,12 +149,19 @@ def remove_titles(trace, points, state):
     selected_titles.set([])
 
 
+@reactive.effect
+@reactive.event(input.selected_period, input.selected_content_type)
+def clean_selected_titles_on_filter_change():
+    selected_titles.set([])
+
+
 with preview_row:
 
     @render.data_frame
     def preview_dataframe():
         df = preview_data(
             input.selected_period(),
+            input.selected_content_type(),
             selected_titles(),
         )
         return render.DataGrid(df, width="100%")
