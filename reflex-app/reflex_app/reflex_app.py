@@ -36,6 +36,7 @@ class State(rx.State):
 
     @rx.event
     def select_plotly_callback(self, evt):
+        # https://github.com/orgs/reflex-dev/discussions/2845
         custom_data = self.figure.data[0]["customdata"]
         selected_point_idx = [p["pointIndex"] for p in evt]
         selected_titles = [
