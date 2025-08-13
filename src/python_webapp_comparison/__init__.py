@@ -1,4 +1,5 @@
 from datetime import date
+from pathlib import Path
 from typing import List
 
 import plotly.express as px
@@ -6,12 +7,17 @@ import polars as pl
 
 
 def __load_data():
+    DATA_FOLDER = Path("data") if Path("data").exists() else Path("../data")
+
+    shows_path = DATA_FOLDER / "shows.csv"
+    movies_path = DATA_FOLDER / "movies.csv"
+
     shows = pl.read_csv(
-        "data/shows.csv",
+        shows_path,
         ignore_errors=True,
     )
     movies = pl.read_csv(
-        "data/movies.csv",
+        movies_path,
         ignore_errors=True,
     )
 
