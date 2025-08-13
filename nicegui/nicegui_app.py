@@ -65,71 +65,38 @@ with filters_row:
     content_type_input.bind_value(filters, "selected_content_type")
     content_type_input.tailwind
 
+
+def card(title, reactive_title, fn_value):
+    with ui.card().classes("flex-1"):
+        with ui.card_section():
+            if reactive_title:
+                ui.label().bind_text_from(
+                    reactive_title,
+                    "value",
+                    backward=lambda s: f"{s.capitalize()}s",
+                )
+            else:
+                ui.label(title)
+
+            ui.label().bind_text_from(
+                filters,
+                "selected_period",
+                backward=lambda _: fn_value(
+                    filters.selected_period, filters.selected_content_type
+                ),
+            ).bind_text_from(
+                filters,
+                "selected_content_type",
+                backward=lambda _: fn_value(
+                    filters.selected_period, filters.selected_content_type
+                ),
+            ).tailwind.font_size("2xl")
+
+
 with card_row:
-    with ui.card().classes("flex-1"):
-        with ui.card_section():
-            elements_card_title = ui.label()
-            elements_card_title.bind_text_from(
-                content_type_input,
-                "value",
-                backward=lambda s: f"{s.capitalize()}s",
-            )
-
-            elements_card_value = ui.label().bind_text_from(
-                filters,
-                "selected_period",
-                backward=lambda _: get_num_elements(
-                    filters.selected_period, filters.selected_content_type
-                ),
-            )
-            elements_card_value.bind_text_from(
-                filters,
-                "selected_content_type",
-                backward=lambda _: get_num_elements(
-                    filters.selected_period, filters.selected_content_type
-                ),
-            )
-            elements_card_value.tailwind.font_size("2xl")
-
-    with ui.card().classes("flex-1"):
-        with ui.card_section():
-            views_card_title = ui.label("Views")
-            views_card_value = ui.label()
-            views_card_value.bind_text_from(
-                filters,
-                "selected_period",
-                backward=lambda _: get_num_views(
-                    filters.selected_period, filters.selected_content_type
-                ),
-            )
-            views_card_value.bind_text_from(
-                filters,
-                "selected_content_type",
-                backward=lambda _: get_num_views(
-                    filters.selected_period, filters.selected_content_type
-                ),
-            )
-            views_card_value.tailwind.font_size("2xl")
-
-    with ui.card().classes("flex-1"):
-        with ui.card_section():
-            hours_card_title = ui.label("Hours Watched")
-            hours_card_value = ui.label()
-            hours_card_value.bind_text_from(
-                filters,
-                "selected_period",
-                backward=lambda _: get_hours_watch(
-                    filters.selected_period, filters.selected_content_type
-                ),
-            )
-            hours_card_value.bind_text_from(
-                filters,
-                "selected_content_type",
-                backward=lambda _: get_hours_watch(
-                    filters.selected_period, filters.selected_content_type
-                ),
-            )
-            hours_card_value.tailwind.font_size("2xl")
+    card(None, content_type_input, get_num_elements)
+    card("Views", None, get_num_views)
+    card("Hours Watched", None, get_hours_watch)
 
 with chart_row:
     fig = plot_velocity_plotly(
@@ -160,9 +127,8 @@ with preview_row:
     data_preview = preview_data(
         filters.selected_period,
         filters.selected_titles,
-    ).to_pandas()
-    data_output = ui.aggrid.from_pandas(data_preview)
-    data_output.classes("max-h-40")
+    )
+    data_output = ui.aggrid.from_polars(data_preview)
 
 if __name__ in {"__main__", "__mp_main__"}:
     ui.run()
