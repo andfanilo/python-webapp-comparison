@@ -124,7 +124,6 @@ with filters_row:
         value=filters.selected_content_type,
     )
     content_type_input.bind_value(filters, "selected_content_type")
-    content_type_input.tailwind
 
 with card_row:
     card(None, content_type_input, get_num_elements)
