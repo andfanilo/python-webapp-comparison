@@ -103,10 +103,12 @@ def get_data():
 
 
 def preview_data(period: str, titles: List[str]):
-    return _data.filter(
+    preview = _data.filter(
         pl.col("report") == period,
-        pl.col("title").is_in(titles),
     )
+    if titles and len(titles) > 0:
+        preview = preview.filter(pl.col("title").is_in(titles))
+    return preview
 
 
 def get_periods():
@@ -175,76 +177,4 @@ def plot_velocity_plotly(period: str, content_type: str):
     fig.update_layout(
         yaxis_type="log",
     )
-    return fig
-
-
-def plot_velocity_altair(period: str, content_type: str):
-    d = _data.filter(
-        pl.col("days_since_release").is_not_null(),
-        pl.col("mean_views_per_day").is_not_null(),
-        pl.col("report") == period,
-        pl.col("type") == content_type,
-    )
-    chart = alt.Chart(d).mark_circle().encode(
-        x=alt.X(
-            "days_since_release",
-            title="Days Since Release",
-            type='quantitative',
-        ),
-        y=alt.Y(
-            "mean_views_per_day",
-            title="Mean Views per Day",
-            scale=alt.Scale(type="log"), 
-            type='quantitative',
-        ),
-        tooltip=[
-            alt.Tooltip('title', title='Title'),
-            alt.Tooltip('days_since_release', title='Days Since Release'),
-            alt.Tooltip('mean_views_per_day', title='Mean Views per Day', format=".2f") # Format for readability
-        ],
-    ).properties(
-        title="Show Velocity"
-    ).interactive()
-
-    return chart
-
-
-def plot_detail_per_titles(titles):
-    group_df = _data.filter(pl.col("title").is_in(titles))
-    res = (
-        group_df.group_by(pl.col("report"))
-        .agg(
-            pl.sum("views").alias("total_views"),
-            pl.sum("hours_viewed").alias("total_watch_hours"),
-        )
-        .sort(
-            pl.col("report"),
-        )
-        .unpivot(
-            index="report",
-            on=["total_views", "total_watch_hours"],
-            variable_name="metric",
-            value_name="value",
-        )
-    )
-    if res.get_column("report").n_unique() > 1:
-        fig = px.area(
-            res,
-            x="report",
-            y="value",
-            facet_row="metric",
-            title="Views / Hours analytics",
-            height=550,
-        )
-        fig.update_yaxes(matches=None)
-    else:
-        fig = px.bar(
-            res,
-            x="report",
-            y="value",
-            facet_row="metric",
-            title="Views / Hours analytics",
-            height=550,
-        )
-        fig.update_yaxes(matches=None)
     return fig

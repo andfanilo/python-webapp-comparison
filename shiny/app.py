@@ -10,7 +10,7 @@ from shiny import reactive
 from shiny.express import module, input, render, ui
 from shinywidgets import render_plotly
 
-selected_titles = reactive.value()
+selected_titles = reactive.value([])
 
 ui.page_opts(
     window_title="Movie Analytics",
@@ -137,13 +137,20 @@ def on_point_selection(trace, points, state):
     print(trace)
     print(points)
     print(state)
-    selected_titles.set(points)
 
 
 def on_deselect(trace, points, state):
-    selected_titles.set(points)
+    print(trace)
+    print(points)
+    print(state)
 
 
-@render.code
-def selection_info():
-    return str(selected_titles.get())
+with preview_row:
+
+    @render.data_frame
+    def preview_dataframe():
+        df = preview_data(
+            input.selected_period(),
+            selected_titles(),
+        )
+        return render.DataGrid(df, width="100%")
