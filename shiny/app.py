@@ -10,19 +10,38 @@ from shiny import reactive
 from shiny.express import input, render, ui
 from shinywidgets import render_plotly  
 
+selected_titles = reactive.value() 
+
 ui.page_opts(
-    title="Movie Analytics Dashboard",
     window_title="Movie Analytics",
     full_width=True,
+    class_="mt-4 px-5",
 )
 
-selection_reactive = reactive.value() 
-
-with ui.layout_columns(
-    col_widths=(4, 8), 
+app = ui.layout_column_wrap(
+    width=1,
     gap="1rem",
-    class_="align-items-end"
-):
+)
+
+with app:
+    title_row = ui.layout_column_wrap()
+    greeting_row = ui.layout_columns(
+        col_widths=(4, 8), 
+        gap="1rem",
+        class_="align-items-end"
+    )
+    filters_row = ui.layout_columns(
+        col_widths=(8, 4), 
+    )
+    card_row = ui.layout_columns(gap="2rem")
+    chart_row = ui.layout_column_wrap()
+    preview_row = ui.layout_column_wrap()
+
+with title_row:
+    ui.h1("Movie Analytics Dashboard")
+    
+
+with greeting_row:
     ui.input_text("name", label=None)
 
     @render.text
@@ -33,9 +52,7 @@ with ui.layout_columns(
         else:
             return f"Hello {name}!"
 
-with ui.layout_columns(
-    col_widths=(8, 4), 
-):
+with filters_row:
     ui.input_select(
         "selected_period", 
         "Select period", 
@@ -48,7 +65,7 @@ with ui.layout_columns(
         ("movie", "show"),
     )
 
-with ui.layout_columns(gap="1rem"):
+with card_row:
     with ui.value_box():
         @render.text
         def display_content_type():
@@ -85,8 +102,7 @@ with ui.layout_columns(gap="1rem"):
             )
             return n_hours
 
-with ui.layout_column_wrap():
-
+with chart_row:
     @render_plotly
     def display_velocity():
         fig = plot_velocity_plotly(
@@ -102,11 +118,14 @@ with ui.layout_column_wrap():
         return w
 
 def on_point_selection(trace, points, state):
-    selection_reactive.set(points)
+    print(trace)
+    print(points)
+    print(state)
+    selected_titles.set(points)
 
 def on_deselect(trace, points, state): 
-    selection_reactive.set(points) 
+    selected_titles.set(points) 
 
 @render.code
 def selection_info():
-    return str(selection_reactive.get())
+    return str(selected_titles.get())
