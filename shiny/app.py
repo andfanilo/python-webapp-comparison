@@ -8,9 +8,9 @@ from python_webapp_comparison import preview_data
 import plotly.graph_objects as go
 from shiny import reactive
 from shiny.express import input, render, ui
-from shinywidgets import render_plotly  
+from shinywidgets import render_plotly
 
-selected_titles = reactive.value() 
+selected_titles = reactive.value()
 
 ui.page_opts(
     window_title="Movie Analytics",
@@ -26,12 +26,10 @@ app = ui.layout_column_wrap(
 with app:
     title_row = ui.layout_column_wrap()
     greeting_row = ui.layout_columns(
-        col_widths=(4, 8), 
-        gap="1rem",
-        class_="align-items-end"
+        col_widths=(4, 8), gap="1rem", class_="align-items-end"
     )
     filters_row = ui.layout_columns(
-        col_widths=(8, 4), 
+        col_widths=(8, 4),
     )
     card_row = ui.layout_columns(gap="2rem")
     chart_row = ui.layout_column_wrap()
@@ -39,7 +37,7 @@ with app:
 
 with title_row:
     ui.h1("Movie Analytics Dashboard")
-    
+
 
 with greeting_row:
     ui.input_text("name", label=None)
@@ -52,10 +50,11 @@ with greeting_row:
         else:
             return f"Hello {name}!"
 
+
 with filters_row:
     ui.input_select(
-        "selected_period", 
-        "Select period", 
+        "selected_period",
+        "Select period",
         get_periods().to_list(),
         width="100%",
     )
@@ -67,10 +66,11 @@ with filters_row:
 
 with card_row:
     with ui.value_box():
+
         @render.text
         def display_content_type():
             return f"{input.selected_content_type().capitalize()}s"
-        
+
         @render.text
         def display_num_elements():
             n_elements = get_num_elements(
@@ -78,7 +78,6 @@ with card_row:
                 input.selected_content_type(),
             )
             return n_elements
-
 
     with ui.value_box():
         "Views"
@@ -90,7 +89,7 @@ with card_row:
                 input.selected_content_type(),
             )
             return n_views
-        
+
     with ui.value_box():
         "Hours Watched"
 
@@ -102,7 +101,9 @@ with card_row:
             )
             return n_hours
 
+
 with chart_row:
+
     @render_plotly
     def display_velocity():
         fig = plot_velocity_plotly(
@@ -113,9 +114,10 @@ with chart_row:
             template="plotly_white",
         )
         w = go.FigureWidget(fig.data, fig.layout)
-        w.data[0].on_selection(on_point_selection) 
-        w.data[0].on_deselect(on_deselect) 
+        w.data[0].on_selection(on_point_selection)
+        w.data[0].on_deselect(on_deselect)
         return w
+
 
 def on_point_selection(trace, points, state):
     print(trace)
@@ -123,8 +125,10 @@ def on_point_selection(trace, points, state):
     print(state)
     selected_titles.set(points)
 
-def on_deselect(trace, points, state): 
-    selected_titles.set(points) 
+
+def on_deselect(trace, points, state):
+    selected_titles.set(points)
+
 
 @render.code
 def selection_info():
