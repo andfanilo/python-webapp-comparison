@@ -11,11 +11,15 @@ from nicegui import html
 from nicegui import ui
 
 
-@binding.bindable_dataclass
 class Filters:
-    selected_period: str
-    selected_content_type: str
-    selected_titles: List[str]
+    selected_period: str = binding.BindableProperty()
+    selected_content_type: str = binding.BindableProperty()
+    selected_titles: List[str] = binding.BindableProperty()
+
+    def __init__(self, period, content_type, titles):
+        self.selected_period = period
+        self.selected_content_type = content_type
+        self.selected_titles = titles
 
 
 app = ui.column().classes("mx-auto container px-8 gap-8")
@@ -98,16 +102,27 @@ with card_row:
     card("Views", None, get_num_views)
     card("Hours Watched", None, get_hours_watch)
 
-with chart_row:
+
+def build_plot(filt):
     fig = plot_velocity_plotly(
-        filters.selected_period,
-        filters.selected_content_type,
+        filt.selected_period,
+        filt.selected_content_type,
     )
     fig.update_layout(
         template="plotly_white",
     )
-    plotly_chart = ui.plotly(fig)
+    return fig
+
+
+with chart_row:
+    plotly_chart = ui.plotly(build_plot(filters))
     plotly_chart.classes("w-full")
+    period_input.on(
+        "update:model-value", lambda _: plotly_chart.update_figure(build_plot(filters))
+    )
+    content_type_input.on(
+        "update:model-value", lambda _: plotly_chart.update_figure(build_plot(filters))
+    )
 
     # ON Event: https://github.com/zauberzeug/nicegui/issues/3762
     plotly_chart.on(
