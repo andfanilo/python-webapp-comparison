@@ -12,6 +12,33 @@ from shinywidgets import render_plotly
 
 selected_titles = reactive.value([])
 
+
+@module
+def card(
+    input,
+    output,
+    session,
+    reactive_title,
+    static_title,
+    fn_value,
+    reactive_period,
+    reactive_content_type,
+):
+    with ui.value_box():
+
+        @render.text
+        def display_title():
+            return static_title or reactive_title().capitalize() + "s"
+
+        @render.text
+        def display_value():
+            res = fn_value(
+                reactive_period(),
+                reactive_content_type(),
+            )
+            return res
+
+
 ui.page_opts(
     window_title="Movie Analytics",
     full_width=True,
@@ -61,32 +88,6 @@ with filters_row:
         "Select Type",
         ("movie", "show"),
     )
-
-
-@module
-def card(
-    input,
-    output,
-    session,
-    reactive_title,
-    static_title,
-    fn_value,
-    reactive_period,
-    reactive_content_type,
-):
-    with ui.value_box():
-
-        @render.text
-        def display_title():
-            return static_title or reactive_title().capitalize() + "s"
-
-        @render.text
-        def display_value():
-            res = fn_value(
-                reactive_period(),
-                reactive_content_type(),
-            )
-            return res
 
 
 with card_row:

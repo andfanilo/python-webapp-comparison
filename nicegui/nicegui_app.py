@@ -22,6 +22,33 @@ class Filters:
         self.selected_titles = titles
 
 
+def card(title, reactive_title, fn_value):
+    with ui.card().classes("flex-1"):
+        with ui.card_section():
+            if reactive_title:
+                ui.label().bind_text_from(
+                    reactive_title,
+                    "value",
+                    backward=lambda s: f"{s.capitalize()}s",
+                )
+            else:
+                ui.label(title)
+
+            ui.label().bind_text_from(
+                filters,
+                "selected_period",
+                backward=lambda _: fn_value(
+                    filters.selected_period, filters.selected_content_type
+                ),
+            ).bind_text_from(
+                filters,
+                "selected_content_type",
+                backward=lambda _: fn_value(
+                    filters.selected_period, filters.selected_content_type
+                ),
+            ).tailwind.font_size("2xl")
+
+
 app = ui.column().classes("mx-auto container px-8 gap-8")
 
 with app:
@@ -68,34 +95,6 @@ with filters_row:
     )
     content_type_input.bind_value(filters, "selected_content_type")
     content_type_input.tailwind
-
-
-def card(title, reactive_title, fn_value):
-    with ui.card().classes("flex-1"):
-        with ui.card_section():
-            if reactive_title:
-                ui.label().bind_text_from(
-                    reactive_title,
-                    "value",
-                    backward=lambda s: f"{s.capitalize()}s",
-                )
-            else:
-                ui.label(title)
-
-            ui.label().bind_text_from(
-                filters,
-                "selected_period",
-                backward=lambda _: fn_value(
-                    filters.selected_period, filters.selected_content_type
-                ),
-            ).bind_text_from(
-                filters,
-                "selected_content_type",
-                backward=lambda _: fn_value(
-                    filters.selected_period, filters.selected_content_type
-                ),
-            ).tailwind.font_size("2xl")
-
 
 with card_row:
     card(None, content_type_input, get_num_elements)
