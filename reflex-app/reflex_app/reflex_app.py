@@ -35,8 +35,16 @@ class State(rx.State):
         self.update_figure()
 
     @rx.event
-    def select_plotly_callback(self, value):
-        print(value)
+    def select_plotly_callback(self, evt):
+        custom_data = self.figure.data[0]["customdata"]
+        selected_point_idx = [p["pointIndex"] for p in evt]
+        selected_titles = [
+            t
+            for ind, l in enumerate(custom_data)
+            for t in l
+            if ind in selected_point_idx
+        ]
+        self.selected_titles = selected_titles
 
     @rx.var
     def greeting(self) -> str:
@@ -61,7 +69,9 @@ class State(rx.State):
     @rx.var
     def compute_data_preview(self) -> pd.DataFrame:
         return preview_data(
-            self.selected_period, self.selected_content_type, []
+            self.selected_period,
+            self.selected_content_type,
+            self.selected_titles,
         ).to_pandas()
 
     @rx.event
