@@ -7,7 +7,7 @@ from python_webapp_comparison import preview_data
 
 import plotly.graph_objects as go
 from shiny import reactive
-from shiny.express import input, render, ui
+from shiny.express import module, input, render, ui
 from shinywidgets import render_plotly
 
 selected_titles = reactive.value()
@@ -35,6 +35,7 @@ with app:
     chart_row = ui.layout_column_wrap()
     preview_row = ui.layout_column_wrap()
 
+
 with title_row:
     ui.h1("Movie Analytics Dashboard")
 
@@ -45,10 +46,7 @@ with greeting_row:
     @render.text
     def greeting():
         name = input.name()
-        if not name:
-            return "Enter your name"
-        else:
-            return f"Hello {name}!"
+        return "Enter your name" if not name else f"Hello {name}!"
 
 
 with filters_row:
@@ -64,42 +62,58 @@ with filters_row:
         ("movie", "show"),
     )
 
+
+@module
+def card(
+    input,
+    output,
+    session,
+    reactive_title,
+    static_title,
+    fn_value,
+    reactive_period,
+    reactive_content_type,
+):
+    with ui.value_box():
+
+        @render.text
+        def display_title():
+            return static_title or reactive_title().capitalize() + "s"
+
+        @render.text
+        def display_value():
+            res = fn_value(
+                reactive_period(),
+                reactive_content_type(),
+            )
+            return res
+
+
 with card_row:
-    with ui.value_box():
-
-        @render.text
-        def display_content_type():
-            return f"{input.selected_content_type().capitalize()}s"
-
-        @render.text
-        def display_num_elements():
-            n_elements = get_num_elements(
-                input.selected_period(),
-                input.selected_content_type(),
-            )
-            return n_elements
-
-    with ui.value_box():
-        "Views"
-
-        @render.text
-        def display_views():
-            n_views = get_num_views(
-                input.selected_period(),
-                input.selected_content_type(),
-            )
-            return n_views
-
-    with ui.value_box():
-        "Hours Watched"
-
-        @render.text
-        def display_hours_watched():
-            n_hours = get_hours_watch(
-                input.selected_period(),
-                input.selected_content_type(),
-            )
-            return n_hours
+    card(
+        "elements_per_content",
+        input.selected_content_type,
+        None,
+        get_num_elements,
+        input.selected_period,
+        input.selected_content_type,
+    )
+    card(
+        "views",
+        None,
+        "Views",
+        get_num_views,
+        input.selected_period,
+        input.selected_content_type,
+    )
+    card(
+        "hours",
+        None,
+        "Hours Watched",
+        get_hours_watch,
+        input.selected_period,
+        input.selected_content_type,
+    )
 
 
 with chart_row:
