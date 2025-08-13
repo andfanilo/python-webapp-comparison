@@ -129,20 +129,23 @@ with chart_row:
         )
         w = go.FigureWidget(fig.data, fig.layout)
         w.data[0].on_selection(on_point_selection)
-        w.data[0].on_deselect(on_deselect)
+        w.data[0].on_deselect(remove_titles)
+        # w.data[0].on_doubleclick(remove_titles)
         return w
 
 
 def on_point_selection(trace, points, state):
-    print(trace)
-    print(points)
-    print(state)
+    custom_data = trace.customdata
+    selected_points = list(trace.selectedpoints)
+
+    titles = [
+        t for ind, l in enumerate(custom_data) for t in l if ind in selected_points
+    ]
+    selected_titles.set(titles)
 
 
-def on_deselect(trace, points, state):
-    print(trace)
-    print(points)
-    print(state)
+def remove_titles(trace, points, state):
+    selected_titles.set([])
 
 
 with preview_row:
