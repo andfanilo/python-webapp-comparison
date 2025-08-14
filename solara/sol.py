@@ -141,6 +141,7 @@ def Page():
             ),
         )
 
+    # https://github.com/widgetti/solara/discussions/1039 Layout issue
     with chart_row:
         solara.FigurePlotly(
             plotly_figure.value,
