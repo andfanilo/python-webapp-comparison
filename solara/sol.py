@@ -5,6 +5,7 @@ from python_webapp_comparison import get_periods
 from python_webapp_comparison import plot_velocity_plotly
 from python_webapp_comparison import preview_data
 
+import plotly.express as px
 import solara
 
 periods = get_periods().to_list()
@@ -14,11 +15,31 @@ name = solara.reactive("")
 selected_period = solara.reactive(periods[0])
 selected_content_type = solara.reactive(content_types[0])
 
-selected_points = solara.reactive({})
+selected_titles = solara.reactive([])
+figure_trace = solara.reactive(px.scatter().data)
+
+
+def build_figure(period, content_type):
+    fig = plot_velocity_plotly(
+        period,
+        content_type,
+    )
+    fig.update_layout(
+        template="plotly_white",
+    )
+    figure_trace.value = fig.data[0]
+    return fig
+
 
 def update_selection(e):
-    print(e)
-    selected_points.set(e)
+    custom_data = figure_trace.value["customdata"]
+    selected_points = list(e["points"]["point_indexes"])
+
+    titles = [
+        t for ind, l in enumerate(custom_data) for t in l if ind in selected_points
+    ]
+    selected_titles.value = titles
+
 
 @solara.component
 def card(title, value):
@@ -26,7 +47,10 @@ def card(title, value):
         title=title,
         style={"flex": 1},
     ):
-        solara.Markdown(str(value))
+        solara.Markdown(
+            str(value), style={"font-size": "1.5rem", "font-weight": "bold"}
+        )
+
 
 @solara.component
 def Page():
@@ -38,23 +62,17 @@ def Page():
     with app:
         solara.Title("Movie Analytics")
         title_row = solara.Row()
-        greeting_row = solara.Row(
-            gap="4rem",
-            style={"align-items": "end"},
+        greeting_row = solara.Columns(
+            widths=(2, 1),
+            style={"gap": "4rem"},
         )
-        filters_row = solara.Row(
-            gap="4rem",
-            style={"align-items": "end"},
+        filters_row = solara.Columns(
+            widths=(2, 1),
+            style={"gap": "4rem"},
         )
-        cards_row = solara.Row(
-            gap="1rem",
-        )
-        chart_row = solara.Row(
-            style={"width": "100%"},
-        )
-        preview_row = solara.Row(
-            style={"width": "100%"},
-        )
+        cards_row = solara.Columns()
+        chart_row = solara.Columns()
+        preview_row = solara.Columns()
 
     with title_row:
         solara.Markdown("# Movie Analytics Dashboard")
@@ -86,45 +104,44 @@ def Page():
 
     with cards_row:
         card(
-            f"{selected_content_type.value.capitalize()}s", 
+            f"{selected_content_type.value.capitalize()}s",
             get_num_elements(
                 selected_period.value,
                 selected_content_type.value,
-            )
+            ),
         )
         card(
-            "Views", 
+            "Views",
             get_num_views(
                 selected_period.value,
                 selected_content_type.value,
-            )
+            ),
         )
         card(
-            "Hours Watched", 
+            "Hours Watched",
             get_hours_watch(
                 selected_period.value,
                 selected_content_type.value,
-            )
+            ),
         )
 
     with chart_row:
-        fig = plot_velocity_plotly(
-            selected_period.value,
-            selected_content_type.value,
-        )
-        fig.update_layout(
-            template="plotly_white",
-        )
         solara.FigurePlotly(
-            fig, 
+            build_figure(
+                selected_period.value,
+                selected_content_type.value,
+            ),
             on_selection=update_selection,
             on_deselect=update_selection,
         )
 
     with preview_row:
-        solara.DataFrame(preview_data(
-            selected_period.value,
-            [],
-        ))
+        solara.DataFrame(
+            preview_data(
+                selected_period.value,
+                selected_content_type.value,
+                selected_titles.value,
+            )
+        )
 
     return app
