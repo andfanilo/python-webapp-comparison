@@ -22,6 +22,11 @@ class State:
         self.selected_titles = titles
 
 
+periods = get_periods().to_list()
+content_types = ["movie", "show"]
+state = State(periods[0], content_types[0], [])
+
+
 def build_plot(state: State):
     fig = plot_velocity_plotly(
         state.selected_period,
@@ -107,10 +112,6 @@ with greeting_row:
 
 
 with filters_row:
-    periods = get_periods().to_list()
-    content_types = ["movie", "show"]
-    state = State(periods[0], content_types[0], [])
-
     period_input = ui.select(
         periods,
         value=state.selected_period,
