@@ -11,7 +11,7 @@ from nicegui import html
 from nicegui import ui
 
 
-class Filters:
+class State:
     selected_period: str = binding.BindableProperty()
     selected_content_type: str = binding.BindableProperty()
     selected_titles: List[str] = binding.BindableProperty()
@@ -22,10 +22,10 @@ class Filters:
         self.selected_titles = titles
 
 
-def build_plot(filters: Filters):
+def build_plot(state: State):
     fig = plot_velocity_plotly(
-        filters.selected_period,
-        filters.selected_content_type,
+        state.selected_period,
+        state.selected_content_type,
     )
     fig.update_layout(
         template="plotly_white",
@@ -33,23 +33,23 @@ def build_plot(filters: Filters):
     return fig
 
 
-def plotly_event_callback(titles: List[str], filters: Filters, data_preview_widget):
-    filters.selected_titles = titles
-    update_data_preview(filters, data_preview_widget)
+def plotly_event_callback(titles: List[str], state: State, data_preview_widget):
+    state.selected_titles = titles
+    update_data_preview(state, data_preview_widget)
 
 
-def update_data_preview(filters: Filters, data_preview_widget):
+def update_data_preview(state: State, data_preview_widget):
     df = preview_data(
-        filters.selected_period,
-        filters.selected_content_type,
-        filters.selected_titles,
+        state.selected_period,
+        state.selected_content_type,
+        state.selected_titles,
     ).to_dicts()
     data_preview_widget.options["rowData"] = df
     data_preview_widget.update()
 
 
-def update_graph(filters: Filters, graph_widget):
-    graph_widget.update_figure(build_plot(filters))
+def update_graph(state: State, graph_widget):
+    graph_widget.update_figure(build_plot(state))
 
 
 def card(title, reactive_title, fn_value):
@@ -65,16 +65,16 @@ def card(title, reactive_title, fn_value):
                 ui.label(title)
 
             ui.label().bind_text_from(
-                filters,
+                state,
                 "selected_period",
                 backward=lambda _: fn_value(
-                    filters.selected_period, filters.selected_content_type
+                    state.selected_period, state.selected_content_type
                 ),
             ).bind_text_from(
-                filters,
+                state,
                 "selected_content_type",
                 backward=lambda _: fn_value(
-                    filters.selected_period, filters.selected_content_type
+                    state.selected_period, state.selected_content_type
                 ),
             ).tailwind.font_size("2xl")
 
@@ -109,21 +109,21 @@ with greeting_row:
 with filters_row:
     periods = get_periods().to_list()
     content_types = ["movie", "show"]
-    filters = Filters(periods[0], content_types[0], [])
+    state = State(periods[0], content_types[0], [])
 
     period_input = ui.select(
         periods,
-        value=filters.selected_period,
+        value=state.selected_period,
         label="Select Period",
     )
-    period_input.bind_value(filters, "selected_period")
+    period_input.bind_value(state, "selected_period")
     period_input.tailwind.flex("auto")
 
     content_type_input = ui.radio(
         ["movie", "show"],
-        value=filters.selected_content_type,
+        value=state.selected_content_type,
     )
-    content_type_input.bind_value(filters, "selected_content_type")
+    content_type_input.bind_value(state, "selected_content_type")
 
 with card_row:
     card(None, content_type_input, get_num_elements)
@@ -132,15 +132,15 @@ with card_row:
 
 
 with chart_row:
-    plotly_chart = ui.plotly(build_plot(filters))
+    plotly_chart = ui.plotly(build_plot(state))
     plotly_chart.classes("w-full")
 
 
 with preview_row:
     data_preview = preview_data(
-        filters.selected_period,
-        filters.selected_content_type,
-        filters.selected_titles,
+        state.selected_period,
+        state.selected_content_type,
+        state.selected_titles,
     )
     data_output = ui.aggrid.from_polars(data_preview)
 
@@ -149,22 +149,30 @@ with preview_row:
 # ON Event: https://github.com/zauberzeug/nicegui/issues/3762
 plotly_chart.on(
     "plotly_selected",
-    lambda e: plotly_event_callback(e.args, filters, data_output),
+    lambda e: plotly_event_callback(e.args, state, data_output),
     js_handler="(event) => emit(event.points.map(point => point.customdata).flat())",
 ).on(
     "plotly_deselect",
-    lambda _: plotly_event_callback([], filters, data_output),
+    lambda _: plotly_event_callback([], state, data_output),
 ).on(
     "plotly_doubleclick",
-    lambda _: plotly_event_callback([], filters, data_output),
+    lambda _: plotly_event_callback([], state, data_output),
 )
 
-period_input.on("update:model-value", lambda _: update_graph(filters, plotly_chart)).on(
-    "update:model-value", lambda _: update_data_preview(filters, data_output)
+
+def handle_widget_callback(state: State, plotly_out, data_out):
+    update_graph(state, plotly_out)
+    update_data_preview(state, data_out)
+
+
+period_input.on(
+    "update:model-value",
+    lambda _: handle_widget_callback(state, plotly_chart, data_output),
 )
 content_type_input.on(
-    "update:model-value", lambda _: update_graph(filters, plotly_chart)
-).on("update:model-value", lambda _: update_data_preview(filters, data_output))
+    "update:model-value",
+    lambda _: handle_widget_callback(state, plotly_chart, data_output),
+)
 
 if __name__ in {"__main__", "__mp_main__"}:
     ui.run()
