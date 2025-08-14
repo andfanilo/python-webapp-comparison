@@ -60,7 +60,7 @@ with app:
     )
     card_row = ui.layout_columns(gap="2rem")
     chart_row = ui.layout_column_wrap()
-    preview_row = ui.layout_column_wrap()
+    preview_row = ui.layout_column_wrap(width=1)
 
 
 with title_row:
@@ -145,13 +145,9 @@ def on_point_selection(trace, points, state):
     selected_titles.set(titles)
 
 
-def remove_titles(trace, points, state):
-    selected_titles.set([])
-
-
 @reactive.effect
-@reactive.event(input.selected_period, input.selected_content_type)
-def clean_selected_titles_on_filter_change():
+@reactive.event(input.selected_period, input.selected_content_type, input.reset_titles)
+def remove_titles():
     selected_titles.set([])
 
 
@@ -165,3 +161,9 @@ with preview_row:
             selected_titles(),
         )
         return render.DataGrid(df, width="100%")
+
+    ui.input_action_button(
+        "reset_titles",
+        "Reset titles",
+        width="100px",
+    )
