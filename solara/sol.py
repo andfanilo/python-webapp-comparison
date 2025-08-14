@@ -5,21 +5,13 @@ from python_webapp_comparison import get_periods
 from python_webapp_comparison import plot_velocity_plotly
 from python_webapp_comparison import preview_data
 
-import plotly.express as px
 import solara
 
 periods = get_periods().to_list()
 content_types = ["movie", "show"]
 
-name = solara.reactive("")
-selected_period = solara.reactive(periods[0])
-selected_content_type = solara.reactive(content_types[0])
 
-selected_titles = solara.reactive([])
-figure_trace = solara.reactive(px.scatter().data)
-
-
-def build_figure(period, content_type):
+def build_plotly_figure(period, content_type):
     fig = plot_velocity_plotly(
         period,
         content_type,
@@ -27,18 +19,39 @@ def build_figure(period, content_type):
     fig.update_layout(
         template="plotly_white",
     )
-    figure_trace.value = fig.data[0]
     return fig
 
 
-def update_selection(e):
-    custom_data = figure_trace.value["customdata"]
+name = solara.reactive("")
+selected_period = solara.reactive(periods[0])
+selected_content_type = solara.reactive(content_types[0])
+
+selected_titles = solara.reactive([])
+plotly_figure = solara.reactive(build_plotly_figure(periods[0], content_types[0]))
+
+
+def select_period_callback(e):
+    selected_period.set(e)
+    plotly_figure.set(
+        build_plotly_figure(selected_period.value, selected_content_type.value)
+    )
+
+
+def select_content_type_callback(e):
+    selected_content_type.set(e)
+    plotly_figure.set(
+        build_plotly_figure(selected_period.value, selected_content_type.value)
+    )
+
+
+def plotly_selection_callback(e):
+    custom_data = plotly_figure.value.data[0]["customdata"]
     selected_points = list(e["points"]["point_indexes"])
 
     titles = [
         t for ind, l in enumerate(custom_data) for t in l if ind in selected_points
     ]
-    selected_titles.value = titles
+    selected_titles.set(titles)
 
 
 @solara.component
@@ -80,7 +93,8 @@ def Page():
     with greeting_row:
         solara.InputText(
             "Enter name",
-            name,
+            value=name,
+            on_value=name.set,
             continuous_update=True,
             style={"flex": 3},
         )
@@ -93,12 +107,14 @@ def Page():
         solara.Select(
             label="Select Period",
             value=selected_period,
+            on_value=select_period_callback,
             values=periods,
             style={"flex": 3},
         )
         solara.ToggleButtonsSingle(
             value=selected_content_type,
             values=content_types,
+            on_value=select_content_type_callback,
             style={"flex": 1},
         )
 
@@ -127,12 +143,9 @@ def Page():
 
     with chart_row:
         solara.FigurePlotly(
-            build_figure(
-                selected_period.value,
-                selected_content_type.value,
-            ),
-            on_selection=update_selection,
-            on_deselect=update_selection,
+            plotly_figure.value,
+            on_selection=plotly_selection_callback,
+            on_deselect=plotly_selection_callback,
         )
 
     with preview_row:
