@@ -18,6 +18,7 @@ uv run shiny run --reload -h 0.0.0.0 shiny/app.py
 uv run panel serve --dev panel/panel_app.py
 uv run nicegui/nicegui_app.py
 uv run solara run solara/sol.py
+uv run dash/dash_app.py
 
 cd reflex-app
 uv run reflex run
