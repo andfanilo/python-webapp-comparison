@@ -10,7 +10,18 @@ from shiny import reactive
 from shiny.express import module, input, render, ui
 from shinywidgets import render_plotly
 
+periods = get_periods().to_list()
+content_types = ["movie", "show"]
+
+################################################
+### STATE
+################################################
+
 selected_titles = reactive.value([])
+
+################################################
+### CARD COMPONENT
+################################################
 
 
 @module
@@ -39,6 +50,10 @@ def card(
             return res
 
 
+################################################
+### APP CONFIG
+################################################
+
 ui.page_opts(
     window_title="Movie Analytics",
     full_width=True,
@@ -49,6 +64,10 @@ app = ui.layout_column_wrap(
     width=1,
     gap="1rem",
 )
+
+################################################
+### LAYOUT
+################################################
 
 with app:
     title_row = ui.layout_column_wrap()
@@ -63,6 +82,9 @@ with app:
     chart_row = ui.layout_column_wrap()
     preview_row = ui.layout_column_wrap(width=1)
 
+################################################
+### TITLE & GREETING
+################################################
 
 with title_row:
     ui.h1("Movie Analytics Dashboard")
@@ -76,20 +98,26 @@ with greeting_row:
         name = input.name()
         return "Enter your name" if not name else f"Hello {name}!"
 
+################################################
+### DROPDOWN FILTERS
+################################################
 
 with filters_row:
     ui.input_select(
         "selected_period",
         "Select period",
-        get_periods().to_list(),
+        periods,
         width="100%",
     )
     ui.input_radio_buttons(
         "selected_content_type",
         "Select Type",
-        ("movie", "show"),
+        content_types,
     )
 
+################################################
+### CARDS
+################################################
 
 with card_row:
     card(
@@ -117,11 +145,14 @@ with card_row:
         input.selected_content_type,
     )
 
+################################################
+### CHART & DATAFRAME
+################################################
 
 with chart_row:
 
     @render_plotly
-    def display_velocity():
+    def build_plotly_figure():
         fig = plot_velocity_plotly(
             input.selected_period(),
             input.selected_content_type(),
@@ -130,13 +161,13 @@ with chart_row:
             template="plotly_white",
         )
         w = go.FigureWidget(fig.data, fig.layout)
-        w.data[0].on_selection(on_point_selection)
+        w.data[0].on_selection(plotly_selection_callback)
         w.data[0].on_deselect(remove_titles)
         # w.data[0].on_doubleclick(remove_titles)
         return w
 
 
-def on_point_selection(trace, points, state):
+def plotly_selection_callback(trace, points, state):
     custom_data = trace.customdata
     selected_points = list(trace.selectedpoints)
 
@@ -155,7 +186,7 @@ def remove_titles():
 with preview_row:
 
     @render.data_frame
-    def preview_dataframe():
+    def compute_data_preview():
         df = preview_data(
             input.selected_period(),
             input.selected_content_type(),

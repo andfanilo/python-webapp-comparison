@@ -10,6 +10,13 @@ from nicegui import binding
 from nicegui import html
 from nicegui import ui
 
+periods = get_periods().to_list()
+content_types = ["movie", "show"]
+
+################################################
+### STATE
+################################################
+
 
 class State:
     selected_period: str = binding.BindableProperty()
@@ -22,12 +29,10 @@ class State:
         self.selected_titles = titles
 
 
-periods = get_periods().to_list()
-content_types = ["movie", "show"]
 state = State(periods[0], content_types[0], [])
 
 
-def build_plot(state: State):
+def build_plotly_figure(state: State):
     fig = plot_velocity_plotly(
         state.selected_period,
         state.selected_content_type,
@@ -38,26 +43,67 @@ def build_plot(state: State):
     return fig
 
 
-def plotly_event_callback(titles: List[str], state: State, data_preview_widget):
-    state.selected_titles = titles
-    update_data_preview(state, data_preview_widget)
+################################################
+### LAYOUT
+################################################
+
+app = ui.column().classes("mx-auto container px-8 gap-8 mt-4")
+
+with app:
+    title_row = ui.row()
+    greeting_row = ui.row(align_items="end").classes("full-width q-col-gutter-sm")
+    filters_row = ui.row(align_items="end").classes("full-width q-col-gutter-sm")
+    card_row = ui.row().classes("full-width q-gutter-md")
+    chart_row = ui.row().classes("full-width")
+    preview_row = ui.row().classes("full-width")
+
+################################################
+### TITLE & GREETING
+################################################
+
+with title_row:
+    html.h1("Movie Analytics Dashboard").classes("text-h3 text-weight-bold")
+
+with greeting_row:
+    name = ui.input(
+        label="Your name",
+        placeholder="Provide your name",
+    )
+    name.classes("col-8")
+    greeting = ui.label()
+    greeting.bind_text_from(
+        name,
+        "value",
+        backward=lambda name: f"Hello {name}!" if name else "Provide a name",
+    )
+    greeting.classes("col text-h5")
+
+################################################
+### DROPDOWN FILTERS
+################################################
+
+with filters_row:
+    period_input = ui.select(
+        periods,
+        value=state.selected_period,
+        label="Select Period",
+    )
+    period_input.bind_value(state, "selected_period")
+    period_input.classes("col-8")
+
+    content_type_input = ui.radio(
+        ["movie", "show"],
+        value=state.selected_content_type,
+    )
+    content_type_input.bind_value(state, "selected_content_type")
+    content_type_input.classes("col")
+
+################################################
+### CARDS
+################################################
 
 
-def update_data_preview(state: State, data_preview_widget):
-    df = preview_data(
-        state.selected_period,
-        state.selected_content_type,
-        state.selected_titles,
-    ).to_dicts()
-    data_preview_widget.options["rowData"] = df
-    data_preview_widget.update()
-
-
-def update_graph(state: State, graph_widget):
-    graph_widget.update_figure(build_plot(state))
-
-
-def card(title, reactive_title, fn_value):
+def card(state: State, title, reactive_title, fn_value):
     with ui.card().classes("col"):
         with ui.card_section():
             if reactive_title:
@@ -84,60 +130,18 @@ def card(title, reactive_title, fn_value):
             ).classes("text-h4")
 
 
-app = ui.column().classes("mx-auto container px-8 gap-8 mt-4")
-
-with app:
-    title_row = ui.row()
-    greeting_row = ui.row(align_items="end").classes("full-width q-col-gutter-sm")
-    filters_row = ui.row(align_items="end").classes("full-width q-col-gutter-sm")
-    card_row = ui.row().classes("full-width q-gutter-md")
-    chart_row = ui.row().classes("full-width")
-    preview_row = ui.row().classes("full-width")
-
-with title_row:
-    html.h1("Movie Analytics Dashboard").classes("text-h3 text-weight-bold")
-
-with greeting_row:
-    name = ui.input(
-        label="Your name",
-        placeholder="Provide your name",
-    )
-    name.classes("col-8")
-    greeting = ui.label()
-    greeting.bind_text_from(
-        name,
-        "value",
-        backward=lambda name: f"Hello {name}!" if name else "Provide a name",
-    )
-    greeting.classes("col text-h5")
-
-
-with filters_row:
-    period_input = ui.select(
-        periods,
-        value=state.selected_period,
-        label="Select Period",
-    )
-    period_input.bind_value(state, "selected_period")
-    period_input.classes("col-8")
-
-    content_type_input = ui.radio(
-        ["movie", "show"],
-        value=state.selected_content_type,
-    )
-    content_type_input.bind_value(state, "selected_content_type")
-    content_type_input.classes("col")
-
 with card_row:
-    card(None, content_type_input, get_num_elements)
-    card("Views", None, get_num_views)
-    card("Hours Watched", None, get_hours_watch)
+    card(state, None, content_type_input, get_num_elements)
+    card(state, "Views", None, get_num_views)
+    card(state, "Hours Watched", None, get_hours_watch)
 
+################################################
+### CHART & DATAFRAME
+################################################
 
 with chart_row:
-    plotly_chart = ui.plotly(build_plot(state))
+    plotly_chart = ui.plotly(build_plotly_figure(state))
     plotly_chart.classes("full-width")
-
 
 with preview_row:
     data_preview = preview_data(
@@ -147,25 +151,31 @@ with preview_row:
     )
     data_output = ui.aggrid.from_polars(data_preview)
 
+################################################
+### CALLBACKS
+################################################
 
-# Only changes titles and data preview
-# ON Event: https://github.com/zauberzeug/nicegui/issues/3762
-plotly_chart.on(
-    "plotly_selected",
-    lambda e: plotly_event_callback(e.args, state, data_output),
-    js_handler="(event) => emit(event.points.map(point => point.customdata).flat())",
-).on(
-    "plotly_deselect",
-    lambda _: plotly_event_callback([], state, data_output),
-).on(
-    "plotly_doubleclick",
-    lambda _: plotly_event_callback([], state, data_output),
-)
+
+def compute_data_preview(state: State, data_preview_widget):
+    df = preview_data(
+        state.selected_period,
+        state.selected_content_type,
+        state.selected_titles,
+    ).to_dicts()
+    data_preview_widget.options["rowData"] = df
+    data_preview_widget.update()
+
+
+def plotly_selection_callback(titles: List[str], state: State, data_preview_widget):
+    """On Change Plotly Selection -> Titles to filter Dataframe"""
+    state.selected_titles = titles
+    compute_data_preview(state, data_preview_widget)
 
 
 def handle_widget_callback(state: State, plotly_out, data_out):
-    update_graph(state, plotly_out)
-    update_data_preview(state, data_out)
+    """On Change Period/Type -> Plotly/Dataframe"""
+    plotly_out.update_figure(build_plotly_figure(state))
+    compute_data_preview(state, data_out)
 
 
 period_input.on(
@@ -175,6 +185,19 @@ period_input.on(
 content_type_input.on(
     "update:model-value",
     lambda _: handle_widget_callback(state, plotly_chart, data_output),
+)
+
+plotly_chart.on(
+    # ON Event: https://github.com/zauberzeug/nicegui/issues/3762
+    "plotly_selected",
+    lambda e: plotly_selection_callback(e.args, state, data_output),
+    js_handler="(event) => emit(event.points.map(point => point.customdata).flat())",
+).on(
+    "plotly_deselect",
+    lambda _: plotly_selection_callback([], state, data_output),
+).on(
+    "plotly_doubleclick",
+    lambda _: plotly_selection_callback([], state, data_output),
 )
 
 if __name__ in {"__main__", "__mp_main__"}:

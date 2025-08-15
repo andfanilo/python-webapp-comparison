@@ -7,29 +7,52 @@ from python_webapp_comparison import preview_data
 
 import panel as pn
 
-pn.extension("plotly", "tabulator")
-
 periods = get_periods().to_list()
 content_types = ["movie", "show"]
 
+################################################
+### APP CONFIG
+################################################
 
-def greet_name(name):
-    return f"Hello {name}!" if name else "Provide a name"
+pn.extension("plotly", "tabulator")
 
+################################################
+### TITLE & GREETING
+################################################
 
-name = pn.widgets.TextInput(
+name_input = pn.widgets.TextInput(
     name="Name",
     placeholder="Give me your name",
     description="Lemme greet you!",
     styles={"flex": "2"},
 )
 
-greeting_rx = pn.bind(greet_name, name)
+
+def greet_name(name):
+    """Reactive Name -> Greeting"""
+    return f"Hello {name}!" if name else "Provide a name"
+
+
+greeting_rx = pn.bind(greet_name, name_input)
 greeting_output = pn.pane.HTML(
     greeting_rx,
     styles={"font-size": "1.2rem", "flex": "1"},
 )
 
+title_row = pn.pane.HTML(
+    "Movie Analytics Dashboad",
+    styles={"font-size": "2rem", "font-weight": "bold"},
+)
+greet_row = pn.FlexBox(
+    name_input,
+    greeting_output,
+    align_items="end",
+    gap="4rem",
+)
+
+################################################
+### DROPDOWN FILTERS
+################################################
 
 selected_period = pn.widgets.Select(
     name="Select period",
@@ -44,11 +67,17 @@ selected_content_type = pn.widgets.ToggleGroup(
     styles={"flex": "1"},
 )
 
-card_title_rx = selected_content_type.rx().capitalize() + "s"
-num_elements_rx = pn.bind(get_num_elements, selected_period, selected_content_type)
-num_elements_rx_int = pn.rx("{n}").format(n=num_elements_rx)
-views_rx = pn.bind(get_num_views, selected_period, selected_content_type)
-hours_watched_rx = pn.bind(get_hours_watch, selected_period, selected_content_type)
+filters_row = pn.FlexBox(
+    selected_period,
+    selected_content_type,
+    gap="4rem",
+    align_items="end",
+)
+
+
+################################################
+### CARDS
+################################################
 
 card_style = {
     "padding": "1rem",
@@ -56,20 +85,30 @@ card_style = {
     "border-radius": "12px",
     "flex": "1",
 }
+
+
+num_elements_rx = pn.bind(get_num_elements, selected_period, selected_content_type)
+num_elements_rx_int = pn.rx("{n}").format(n=num_elements_rx)
 card_num_elements = pn.FlexBox(
-    pn.pane.HTML(card_title_rx),
+    pn.pane.HTML(selected_content_type.rx().capitalize() + "s"),
     pn.pane.HTML(
         num_elements_rx_int, styles={"font-size": "2rem", "font-weight": "bold"}
     ),
     flex_direction="column",
     styles=card_style,
 )
+
+
+views_rx = pn.bind(get_num_views, selected_period, selected_content_type)
 card_views = pn.FlexBox(
     pn.pane.HTML("Views"),
     pn.pane.HTML(views_rx, styles={"font-size": "2rem", "font-weight": "bold"}),
     flex_direction="column",
     styles=card_style,
 )
+
+
+hours_watched_rx = pn.bind(get_hours_watch, selected_period, selected_content_type)
 card_hours = pn.FlexBox(
     pn.pane.HTML("Hours Watched"),
     pn.pane.HTML(hours_watched_rx, styles={"font-size": "2rem", "font-weight": "bold"}),
@@ -77,8 +116,20 @@ card_hours = pn.FlexBox(
     styles=card_style,
 )
 
+card_row = pn.FlexBox(
+    card_num_elements,
+    card_views,
+    card_hours,
+    gap="4rem",
+)
+
+################################################
+### CHART & DATAFRAME
+################################################
+
 
 def build_plotly_figure(period, content_type):
+    """Reactive Period/Type -> Plotly"""
     fig = plot_velocity_plotly(
         period,
         content_type,
@@ -89,61 +140,41 @@ def build_plotly_figure(period, content_type):
     return fig
 
 
-plotly_chart_rx = pn.bind(build_plotly_figure, selected_period, selected_content_type)
-plotly_pane = pn.pane.Plotly(plotly_chart_rx, sizing_mode="stretch_width")
-
-
-def extract_selected_titles(plotly_selected_data):
+def plotly_selection_callback(plotly_selected_data):
+    """Reactive Plotly Selection -> Titles to filter Dataframe"""
     if plotly_selected_data:
         return [p["hovertext"] for p in plotly_selected_data["points"]]
     else:
         return []
 
 
-selected_titles = pn.bind(extract_selected_titles, plotly_pane.param.selected_data)
-
-
-def build_data_preview(period, content_type, titles):
+def compute_data_preview(period, content_type, titles):
+    """Reactive Period/Type/Titles -> Dataframe"""
     df = preview_data(period, content_type, titles).to_pandas()
     return df
 
 
+plotly_chart_rx = pn.bind(build_plotly_figure, selected_period, selected_content_type)
+plotly_pane = pn.pane.Plotly(plotly_chart_rx, sizing_mode="stretch_width")
+
+selected_titles = pn.bind(plotly_selection_callback, plotly_pane.param.selected_data)
+
 data_preview_rx = pn.bind(
-    build_data_preview, selected_period, selected_content_type, selected_titles
+    compute_data_preview, selected_period, selected_content_type, selected_titles
 )
 data_preview_pane = pn.widgets.Tabulator(data_preview_rx, sizing_mode="stretch_width")
 
-title_row = pn.pane.HTML(
-    "Movie Analytics Dashboad",
-    styles={"font-size": "2rem", "font-weight": "bold"},
-)
 
-greet_row = pn.FlexBox(
-    name,
-    greeting_output,
-    align_items="end",
-    gap="4rem",
-)
-
-filters_row = pn.FlexBox(
-    selected_period,
-    selected_content_type,
-    gap="4rem",
-    align_items="end",
-)
-
-card_row = pn.FlexBox(
-    card_num_elements,
-    card_views,
-    card_hours,
-    gap="4rem",
-)
 chart_row = pn.Row(
     plotly_pane,
 )
 preview_row = pn.Row(
     data_preview_pane,
 )
+
+################################################
+### LAYOUT
+################################################
 
 app = pn.FlexBox(
     title_row,

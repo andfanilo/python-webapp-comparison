@@ -22,12 +22,20 @@ def build_plotly_figure(period, content_type):
     return fig
 
 
+################################################
+### STATE
+################################################
+
 name = solara.reactive("")
 selected_period = solara.reactive(periods[0])
 selected_content_type = solara.reactive(content_types[0])
 
 selected_titles = solara.reactive([])
 plotly_figure = solara.reactive(build_plotly_figure(periods[0], content_types[0]))
+
+################################################
+### CALLBACKS
+################################################
 
 
 def select_period_callback(e):
@@ -54,14 +62,9 @@ def plotly_selection_callback(e):
     selected_titles.set(titles)
 
 
-@solara.component
-def card(title, value):
-    with solara.Card(
-        title=title,
-    ):
-        solara.Markdown(
-            str(value), style={"font-size": "1.5rem", "font-weight": "bold"}
-        )
+################################################
+### APP
+################################################
 
 
 @solara.component
@@ -73,6 +76,12 @@ def Page():
 
     with app:
         solara.Title("Movie Analytics")
+
+    ################################################
+    ### LAYOUT
+    ################################################
+
+    with app:
         title_row = solara.Row()
         greeting_row = solara.Columns(
             widths=(2, 1),
@@ -85,6 +94,10 @@ def Page():
         cards_row = solara.Columns()
         chart_row = solara.Columns()
         preview_row = solara.Columns()
+
+    ################################################
+    ### TITLE & GREETING
+    ################################################
 
     with title_row:
         solara.Markdown("# Movie Analytics Dashboard")
@@ -101,6 +114,10 @@ def Page():
             style={"font-size": "1.2rem"},
         )
 
+    ################################################
+    ### DROPDOWN FILTERS
+    ################################################
+
     with filters_row:
         solara.Select(
             label="Select Period",
@@ -115,6 +132,18 @@ def Page():
             on_value=select_content_type_callback,
             style={"flex": 1},
         )
+
+    ################################################
+    ### CARDS
+    ################################################
+
+    def card(title, value):
+        with solara.Card(
+            title=title,
+        ):
+            solara.Markdown(
+                str(value), style={"font-size": "1.5rem", "font-weight": "bold"}
+            )
 
     with cards_row:
         card(
@@ -138,6 +167,10 @@ def Page():
                 selected_content_type.value,
             ),
         )
+
+    ################################################
+    ### CHART & DATAFRAME
+    ################################################
 
     # https://github.com/widgetti/solara/discussions/1039 Layout issue
     with chart_row:

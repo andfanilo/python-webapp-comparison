@@ -15,6 +15,10 @@ from python_webapp_comparison import preview_data
 periods = get_periods()
 content_types = ["movie", "show"]
 
+################################################
+### STATE
+################################################
+
 
 class State(rx.State):
     name: str = ""
@@ -24,20 +28,65 @@ class State(rx.State):
 
     figure: go.Figure = px.scatter()
 
+    ################################################
+    ### REACTIVITY
+    ################################################
+
+    @rx.var
+    def greeting(self) -> str:
+        """Reactive Name -> Greeting"""
+        return f"Hello {self.name}!" if self.name else "Enter your name"
+
+    @rx.var(cache=True)
+    def card_content_title(self) -> str:
+        """Reactive Period -> Card title"""
+        return f"{self.selected_content_type.capitalize()}s"
+
+    @rx.var(cache=True)
+    def count_num_elements(self) -> int:
+        """Reactive Period/Type -> Count Card value"""
+        return get_num_elements(self.selected_period, self.selected_content_type)
+
+    @rx.var(cache=True)
+    def count_num_views(self) -> str:
+        """Reactive Period/Type -> Views Card value"""
+        return get_num_views(self.selected_period, self.selected_content_type)
+
+    @rx.var(cache=True)
+    def count_hours_watch(self) -> str:
+        """Reactive Period/Type -> Hours Card value"""
+        return get_hours_watch(self.selected_period, self.selected_content_type)
+
+    @rx.var
+    def compute_data_preview(self) -> pd.DataFrame:
+        """Reactive Period/Type/Titles -> Dataframe"""
+        return preview_data(
+            self.selected_period,
+            self.selected_content_type,
+            self.selected_titles,
+        ).to_pandas()
+
+    ################################################
+    ### CALLBACKS
+    ################################################
+
     @rx.event
     def select_period_callback(self, value):
+        """On Change Period -> Titles to filter Dataframe"""
         self.selected_period = value
         self.selected_titles = []
-        self.update_figure()
+        self.build_plotly_figure()
 
     @rx.event
     def select_content_type_callback(self, value):
+        """On Change Type -> Titles to filter Dataframe"""
         self.selected_content_type = value
         self.selected_titles = []
-        self.update_figure()
+        self.build_plotly_figure()
 
     @rx.event
-    def select_plotly_callback(self, evt):
+    def plotly_selection_callback(self, evt):
+        """On Change Plotly Selection -> Titles to filter Dataframe"""
         # https://github.com/orgs/reflex-dev/discussions/2845
         custom_data = self.figure.data[0]["customdata"]
         selected_point_idx = [p["pointIndex"] for p in evt]
@@ -49,38 +98,16 @@ class State(rx.State):
         ]
         self.selected_titles = selected_titles
 
-    @rx.var
-    def greeting(self) -> str:
-        return f"Hello {self.name}!" if self.name else "Enter your name"
-
-    @rx.var(cache=True)
-    def card_content_title(self) -> str:
-        return f"{self.selected_content_type.capitalize()}s"
-
-    @rx.var(cache=True)
-    def count_num_elements(self) -> int:
-        return get_num_elements(self.selected_period, self.selected_content_type)
-
-    @rx.var(cache=True)
-    def count_num_views(self) -> str:
-        return get_num_views(self.selected_period, self.selected_content_type)
-
-    @rx.var(cache=True)
-    def count_hours_watch(self) -> str:
-        return get_hours_watch(self.selected_period, self.selected_content_type)
-
-    @rx.var
-    def compute_data_preview(self) -> pd.DataFrame:
-        return preview_data(
-            self.selected_period,
-            self.selected_content_type,
-            self.selected_titles,
-        ).to_pandas()
-
     @rx.event
-    def update_figure(self):
+    def build_plotly_figure(self):
+        """On Change Period/Type -> Plotly Chart"""
         fig = plot_velocity_plotly(self.selected_period, self.selected_content_type)
         self.figure = fig
+
+
+################################################
+### TITLE & GREETING
+################################################
 
 
 def title_row() -> rx.Component:
@@ -121,6 +148,11 @@ def greeting_row() -> rx.Component:
     )
 
 
+################################################
+### DROPDOWN FILTERS
+################################################
+
+
 def filters_row() -> rx.Component:
     period_select = rx.flex(
         rx.text("Select period:", as_="span"),
@@ -151,6 +183,11 @@ def filters_row() -> rx.Component:
     )
 
 
+################################################
+### CARDS
+################################################
+
+
 def card(title, value) -> rx.Component:
     return rx.card(
         rx.flex(
@@ -174,11 +211,16 @@ def card_row() -> rx.Component:
     )
 
 
+################################################
+### CHART & DATAFRAME
+################################################
+
+
 def chart_row() -> rx.Component:
     return rx.plotly(
         data=State.figure,
-        on_mount=State.update_figure,
-        on_selected=State.select_plotly_callback.throttle(500),
+        on_mount=State.build_plotly_figure,
+        on_selected=State.plotly_selection_callback.throttle(500),
         template=pio.templates["plotly_white"],
         class_name="w-full",
     )
@@ -193,6 +235,11 @@ def preview_row() -> rx.Component:
         ),
         class_name="w-full max-h-8",
     )
+
+
+################################################
+### LAYOUT
+################################################
 
 
 @rx.page(route="/", title="Movies Dashboard")

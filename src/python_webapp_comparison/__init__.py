@@ -7,6 +7,7 @@ import polars as pl
 
 
 def __load_data():
+    # ../data is for Reflex because Reflex runs from its own folder
     DATA_FOLDER = Path("data") if Path("data").exists() else Path("../data")
 
     shows_path = DATA_FOLDER / "shows.csv"

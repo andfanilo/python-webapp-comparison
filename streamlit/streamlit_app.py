@@ -7,12 +7,20 @@ from python_webapp_comparison import preview_data
 
 import streamlit as st
 
-st.set_page_config(page_title="Movie Analytics", layout="wide")
-
 periods = get_periods()
 content_types = ("movie", "show")
 
+################################################
+### APP CONFIG
+################################################
+
+st.set_page_config(page_title="Movie Analytics", layout="wide")
+
 app = st.container(gap="medium")
+
+################################################
+### LAYOUT
+################################################
 
 with app:
     title_row = st.container()
@@ -29,6 +37,10 @@ with app:
     chart_row = st.container()
     preview_row = st.container()
 
+################################################
+### TITLE & GREETING
+################################################
+
 title_row.title("Movie Analytics Dashboard")
 
 with greeting_row[0]:
@@ -38,6 +50,10 @@ with greeting_row[1]:
         st.markdown("Enter name", width="content")
     else:
         st.markdown(f"Hello {st.session_state.name}!", width="content")
+
+################################################
+### DROPDOWN FILTERS
+################################################
 
 with filters_row[0]:
     st.selectbox("Select Period: ", periods, 0, width="stretch", key="selected_period")
@@ -50,6 +66,10 @@ with filters_row[1]:
         width="stretch",
         key="selected_content_type",
     )
+
+################################################
+### CARDS
+################################################
 
 with card_row:
     st.metric(
@@ -73,6 +93,10 @@ with card_row:
         ),
         border=True,
     )
+
+################################################
+### CHART & DATAFRAME
+################################################
 
 with chart_row:
     fig = plot_velocity_plotly(

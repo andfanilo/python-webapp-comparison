@@ -35,6 +35,10 @@ def build_plot(period, content_type):
     return fig
 
 
+################################################
+### LAYOUT
+################################################
+
 with gr.Blocks(css=css) as demo:
     title_row = gr.Row()
     greeting_row = gr.Row()
@@ -42,6 +46,10 @@ with gr.Blocks(css=css) as demo:
     card_row = gr.Row()
     chart_row = gr.Row()
     preview_row = gr.Row()
+
+    ################################################
+    ### TITLE & GREETING
+    ################################################
 
     with title_row:
         gr.Markdown("# Movie Analytics Dashboard")
@@ -56,14 +64,20 @@ with gr.Blocks(css=css) as demo:
             "Provide your name",
         )
 
-        @name_input.change(
-            inputs=[name_input],
-            outputs=[greeting_output],
-        )
-        def update_greeting(name):
-            if not name:
-                return "Provide your name"
-            return f"Hello {name}!"
+    @gr.on(
+        triggers=[name_input.change],
+        inputs=[name_input],
+        outputs=[greeting_output],
+    )
+    def greet_name(name):
+        """On Change Name -> Greeting"""
+        if not name:
+            return "Provide your name"
+        return f"Hello {name}!"
+
+    ################################################
+    ### DROPDOWN FILTERS
+    ################################################
 
     with filters_row:
         selected_period = gr.Dropdown(
@@ -80,75 +94,91 @@ with gr.Blocks(css=css) as demo:
             scale=1,
         )
 
+    ################################################
+    ### CARDS
+    ################################################
+
     with card_row:
-        with gr.Column(elem_classes="card"):
-            display_content_type = gr.Markdown(
-                f"{selected_content_type.value.capitalize()}s",
-                elem_classes="card__title",
-            )
-            num_elements_output = gr.Markdown(
-                f"{get_num_elements(selected_period.value, selected_content_type.value)}",
-                elem_classes="card__value",
-            )
+        count_card = gr.Column(elem_classes="card")
+        views_card = gr.Column(elem_classes="card")
+        hours_card = gr.Column(elem_classes="card")
 
-        with gr.Column(elem_classes="card"):
-            gr.Markdown("Views", elem_classes="card__title")
-            num_views_output = gr.Markdown(
-                get_num_views(selected_period.value, selected_content_type.value),
-                elem_classes="card__value",
-            )
+    with count_card:
+        display_content_type = gr.Markdown(
+            f"{selected_content_type.value.capitalize()}s",
+            elem_classes="card__title",
+        )
+        num_elements_output = gr.Markdown(
+            f"{get_num_elements(selected_period.value, selected_content_type.value)}",
+            elem_classes="card__value",
+        )
 
-        with gr.Column(elem_classes="card"):
-            gr.Markdown(
-                "Hours Watched",
-                elem_classes="card__title",
-            )
-            num_hours_output = gr.Markdown(
-                get_hours_watch(selected_period.value, selected_content_type.value),
-                elem_classes="card__value",
-            )
+    with views_card:
+        gr.Markdown("Views", elem_classes="card__title")
+        num_views_output = gr.Markdown(
+            get_num_views(selected_period.value, selected_content_type.value),
+            elem_classes="card__value",
+        )
 
-            @gr.on(
-                triggers=[selected_period.change, selected_content_type.change],
-                inputs=[selected_period, selected_content_type],
-                outputs=[display_content_type, num_elements_output],
-            )
-            def update_num_elements_card(period, content_type):
-                res_type = f"{selected_content_type.value.capitalize()}s"
-                res_num = f"{get_num_elements(period, content_type)}"
-                return res_type, res_num
+    with hours_card:
+        gr.Markdown(
+            "Hours Watched",
+            elem_classes="card__title",
+        )
+        num_hours_output = gr.Markdown(
+            get_hours_watch(selected_period.value, selected_content_type.value),
+            elem_classes="card__value",
+        )
 
-            @gr.on(
-                triggers=[selected_period.change, selected_content_type.change],
-                inputs=[selected_period, selected_content_type],
-                outputs=[num_views_output],
-            )
-            def update_views_card(period, content_type):
-                res_num = f"{get_num_views(period, content_type)}"
-                return res_num
+    @gr.on(
+        triggers=[selected_period.change, selected_content_type.change],
+        inputs=[selected_period, selected_content_type],
+        outputs=[display_content_type, num_elements_output],
+    )
+    def update_num_card(period, content_type):
+        """On Change Period/Type -> Count Card title/value"""
+        res_type = f"{selected_content_type.value.capitalize()}s"
+        res_num = f"{get_num_elements(period, content_type)}"
+        return res_type, res_num
 
-            @gr.on(
-                triggers=[selected_period.change, selected_content_type.change],
-                inputs=[selected_period, selected_content_type],
-                outputs=[num_hours_output],
-            )
-            def update_hours_card(period, content_type):
-                res_num = f"{get_hours_watch(period, content_type)}"
-                return res_num
+    @gr.on(
+        triggers=[selected_period.change, selected_content_type.change],
+        inputs=[selected_period, selected_content_type],
+        outputs=[num_views_output],
+    )
+    def update_views_card(period, content_type):
+        """On Change Period/Type -> Views Card value"""
+        res_num = f"{get_num_views(period, content_type)}"
+        return res_num
+
+    @gr.on(
+        triggers=[selected_period.change, selected_content_type.change],
+        inputs=[selected_period, selected_content_type],
+        outputs=[num_hours_output],
+    )
+    def update_hours_card(period, content_type):
+        """On Change Period/Type -> Hours Card value"""
+        res_num = f"{get_hours_watch(period, content_type)}"
+        return res_num
+
+    ################################################
+    ### CHART & DATAFRAME
+    ################################################
 
     with chart_row:
         display_plotly = gr.Plot(
             build_plot(selected_period.value, selected_content_type.value)
         )
 
-        @gr.on(
-            triggers=[selected_period.change, selected_content_type.change],
-            inputs=[selected_period, selected_content_type],
-            outputs=display_plotly,
-        )
-        def update_plotly_output(period, content_type):
-            fig = build_plot(period, content_type)
-            return fig
+    @gr.on(
+        triggers=[selected_period.change, selected_content_type.change],
+        inputs=[selected_period, selected_content_type],
+        outputs=display_plotly,
+    )
+    def build_plotly_figure(period, content_type):
+        """On Change Period/Type -> Plotly Chart"""
+        fig = build_plot(period, content_type)
+        return fig
 
     with preview_row:
         data_preview = gr.DataFrame(
@@ -157,13 +187,14 @@ with gr.Blocks(css=css) as demo:
             ).to_pandas(),
         )
 
-        @gr.on(
-            triggers=[selected_period.change, selected_content_type.change],
-            inputs=[selected_period, selected_content_type],
-            outputs=data_preview,
-        )
-        def update_data_preview(period, content_type):
-            return preview_data(period, content_type, []).to_pandas()
+    @gr.on(
+        triggers=[selected_period.change, selected_content_type.change],
+        inputs=[selected_period, selected_content_type],
+        outputs=data_preview,
+    )
+    def compute_data_preview(period, content_type):
+        """On Change Period/Type -> Dataframe"""
+        return preview_data(period, content_type, []).to_pandas()
 
 
 demo.launch()
