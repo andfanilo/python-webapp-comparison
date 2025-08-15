@@ -1,6 +1,7 @@
-# Trying out all Python Data Web Frameworks
+# Trying out all Python Web App Libraries for a Dashboard
 
-![](./images/streamlit.PNG)
+![](./images/Artboard_1.png)
+![](./images/Artboard_2.png)
 
 ```sh
 # Build .venv environment
