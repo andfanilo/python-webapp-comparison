@@ -20,18 +20,20 @@ class State(rx.State):
     name: str = ""
     selected_period: str = periods[0]
     selected_content_type: str = content_types[0]
-    selected_titles: List[str] = None
+    selected_titles: List[str]
 
     figure: go.Figure = px.scatter()
 
     @rx.event
     def select_period_callback(self, value):
         self.selected_period = value
+        self.selected_titles = []
         self.update_figure()
 
     @rx.event
     def select_content_type_callback(self, value):
         self.selected_content_type = value
+        self.selected_titles = []
         self.update_figure()
 
     @rx.event
@@ -102,7 +104,7 @@ def greeting_row() -> rx.Component:
         input_box,
         direction="column",
         spacing="1",
-        class_name="flex-auto",
+        class_name="flex-2",
     )
     greeting_out = rx.text(
         State.greeting,
@@ -110,14 +112,13 @@ def greeting_row() -> rx.Component:
         class_name="flex-1",
     )
 
-    output = rx.flex(
+    return rx.flex(
         input_widget,
         greeting_out,
         align="end",
         spacing="8",
         class_name="w-full",
     )
-    return output
 
 
 def filters_row() -> rx.Component:
@@ -159,7 +160,7 @@ def card(title, value) -> rx.Component:
             direction="column",
         ),
         size="4",
-        class_name="flex-auto",
+        class_name="flex-1",
     )
 
 
@@ -177,7 +178,7 @@ def chart_row() -> rx.Component:
     return rx.plotly(
         data=State.figure,
         on_mount=State.update_figure,
-        on_selected=State.select_plotly_callback,
+        on_selected=State.select_plotly_callback.throttle(500),
         template=pio.templates["plotly_white"],
         class_name="w-full",
     )

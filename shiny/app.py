@@ -53,10 +53,11 @@ app = ui.layout_column_wrap(
 with app:
     title_row = ui.layout_column_wrap()
     greeting_row = ui.layout_columns(
-        col_widths=(4, 8), gap="1rem", class_="align-items-end"
+        col_widths=(8, 4), gap="1rem", class_="align-items-end"
     )
     filters_row = ui.layout_columns(
         col_widths=(8, 4),
+        gap="1rem",
     )
     card_row = ui.layout_columns(gap="2rem")
     chart_row = ui.layout_column_wrap()
@@ -68,7 +69,7 @@ with title_row:
 
 
 with greeting_row:
-    ui.input_text("name", label=None)
+    ui.input_text("name", label="Enter your name", width="100%")
 
     @render.text
     def greeting():

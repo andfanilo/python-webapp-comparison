@@ -58,7 +58,7 @@ def update_graph(state: State, graph_widget):
 
 
 def card(title, reactive_title, fn_value):
-    with ui.card().classes("flex-1"):
+    with ui.card().classes("col"):
         with ui.card_section():
             if reactive_title:
                 ui.label().bind_text_from(
@@ -81,34 +81,35 @@ def card(title, reactive_title, fn_value):
                 backward=lambda _: fn_value(
                     state.selected_period, state.selected_content_type
                 ),
-            ).tailwind.font_size("2xl")
+            ).classes("text-h4")
 
 
-app = ui.column().classes("mx-auto container px-8 gap-8")
+app = ui.column().classes("mx-auto container px-8 gap-8 mt-4")
 
 with app:
     title_row = ui.row()
-    greeting_row = ui.row(align_items="end").classes("justify-between w-full")
-    filters_row = ui.row(align_items="end").classes("gap-16 justify-between w-full")
-    card_row = ui.row().classes("w-full")
-    chart_row = ui.row().classes("w-full")
-    preview_row = ui.row().classes("w-full")
+    greeting_row = ui.row(align_items="end").classes("full-width q-col-gutter-sm")
+    filters_row = ui.row(align_items="end").classes("full-width q-col-gutter-sm")
+    card_row = ui.row().classes("full-width q-gutter-md")
+    chart_row = ui.row().classes("full-width")
+    preview_row = ui.row().classes("full-width")
 
 with title_row:
-    html.h1("Movie Analytics Dashboard").tailwind.font_size("4xl").font_weight("bold")
+    html.h1("Movie Analytics Dashboard").classes("text-h3 text-weight-bold")
 
 with greeting_row:
     name = ui.input(
         label="Your name",
         placeholder="Provide your name",
     )
+    name.classes("col-8")
     greeting = ui.label()
     greeting.bind_text_from(
         name,
         "value",
         backward=lambda name: f"Hello {name}!" if name else "Provide a name",
     )
-    greeting.tailwind.font_size("2xl")
+    greeting.classes("col text-h5")
 
 
 with filters_row:
@@ -118,13 +119,14 @@ with filters_row:
         label="Select Period",
     )
     period_input.bind_value(state, "selected_period")
-    period_input.tailwind.flex("auto")
+    period_input.classes("col-8")
 
     content_type_input = ui.radio(
         ["movie", "show"],
         value=state.selected_content_type,
     )
     content_type_input.bind_value(state, "selected_content_type")
+    content_type_input.classes("col")
 
 with card_row:
     card(None, content_type_input, get_num_elements)
@@ -134,7 +136,7 @@ with card_row:
 
 with chart_row:
     plotly_chart = ui.plotly(build_plot(state))
-    plotly_chart.classes("w-full")
+    plotly_chart.classes("full-width")
 
 
 with preview_row:

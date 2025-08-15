@@ -50,8 +50,11 @@ with gr.Blocks(css=css) as demo:
         name_input = gr.Textbox(
             label="Enter your name",
             container=False,
+            scale=2,
         )
-        greeting_output = gr.Markdown("Provide your name")
+        greeting_output = gr.HTML(
+            "Provide your name",
+        )
 
         @name_input.change(
             inputs=[name_input],
@@ -68,11 +71,13 @@ with gr.Blocks(css=css) as demo:
             value=periods[0],
             label="Select period:",
             interactive=True,
+            scale=2,
         )
         selected_content_type = gr.Radio(
             content_types,
             value=content_types[0],
             interactive=True,
+            scale=1,
         )
 
     with card_row:

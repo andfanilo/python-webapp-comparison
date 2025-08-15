@@ -58,7 +58,6 @@ def plotly_selection_callback(e):
 def card(title, value):
     with solara.Card(
         title=title,
-        style={"flex": 1},
     ):
         solara.Markdown(
             str(value), style={"font-size": "1.5rem", "font-weight": "bold"}
@@ -77,11 +76,11 @@ def Page():
         title_row = solara.Row()
         greeting_row = solara.Columns(
             widths=(2, 1),
-            style={"gap": "4rem"},
+            style={"gap": "2rem"},
         )
         filters_row = solara.Columns(
             widths=(2, 1),
-            style={"gap": "4rem"},
+            style={"gap": "2rem"},
         )
         cards_row = solara.Columns()
         chart_row = solara.Columns()
@@ -96,11 +95,10 @@ def Page():
             value=name,
             on_value=name.set,
             continuous_update=True,
-            style={"flex": 3},
         )
         solara.Markdown(
             f"Hello {name.value}" if name.value else "Enter name",
-            style={"flex": 1, "font-size": "1.2rem"},
+            style={"font-size": "1.2rem"},
         )
 
     with filters_row:

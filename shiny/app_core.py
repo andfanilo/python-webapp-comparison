@@ -51,7 +51,7 @@ greeting_row = ui.layout_columns(
     ui.input_text("name", label=None, width="100%"),
     ui.output_text("greeting"),
     col_widths=(8, 4),
-    gap="4rem",
+    gap="2rem",
     class_="align-items-end",
 )
 filters_row = ui.layout_columns(
@@ -67,14 +67,14 @@ filters_row = ui.layout_columns(
         ("movie", "show"),
     ),
     col_widths=(8, 4),
-    gap="4rem",
+    gap="2rem",
 )
 card_row = ui.layout_columns(
     card_ui("elements_per_content"),
     card_ui("views"),
     card_ui("hours"),
     col_widths=(4, 4, 4),
-    gap="4rem",
+    gap="2rem",
 )
 chart_row = ui.layout_column_wrap(
     output_widget("display_velocity"),

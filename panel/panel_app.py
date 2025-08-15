@@ -21,7 +21,7 @@ name = pn.widgets.TextInput(
     name="Name",
     placeholder="Give me your name",
     description="Lemme greet you!",
-    styles={"flex": "1.2"},
+    styles={"flex": "2"},
 )
 
 greeting_rx = pn.bind(greet_name, name)
@@ -35,7 +35,7 @@ selected_period = pn.widgets.Select(
     name="Select period",
     options=periods,
     value=periods[0],
-    styles={"flex": "1.2"},
+    styles={"flex": "2"},
 )
 selected_content_type = pn.widgets.ToggleGroup(
     name="Select type",
@@ -59,20 +59,20 @@ card_style = {
 card_num_elements = pn.FlexBox(
     pn.pane.HTML(card_title_rx),
     pn.pane.HTML(
-        num_elements_rx_int, styles={"font-size": "4rem", "font-weight": "bold"}
+        num_elements_rx_int, styles={"font-size": "2rem", "font-weight": "bold"}
     ),
     flex_direction="column",
     styles=card_style,
 )
 card_views = pn.FlexBox(
     pn.pane.HTML("Views"),
-    pn.pane.HTML(views_rx, styles={"font-size": "4rem", "font-weight": "bold"}),
+    pn.pane.HTML(views_rx, styles={"font-size": "2rem", "font-weight": "bold"}),
     flex_direction="column",
     styles=card_style,
 )
 card_hours = pn.FlexBox(
     pn.pane.HTML("Hours Watched"),
-    pn.pane.HTML(hours_watched_rx, styles={"font-size": "4rem", "font-weight": "bold"}),
+    pn.pane.HTML(hours_watched_rx, styles={"font-size": "2rem", "font-weight": "bold"}),
     flex_direction="column",
     styles=card_style,
 )

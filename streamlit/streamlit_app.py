@@ -9,39 +9,45 @@ import streamlit as st
 
 st.set_page_config(page_title="Movie Analytics", layout="wide")
 
+periods = get_periods()
+content_types = ("movie", "show")
+
 app = st.container(gap="medium")
 
 with app:
     title_row = st.container()
-    greeting_row = st.container(
-        horizontal=True,
-        horizontal_alignment="distribute",
+    greeting_row = st.columns(
+        (2, 1),
+        gap="medium",
         vertical_alignment="bottom",
     )
-    filters_row = st.container(horizontal=True, gap="large")
-    card_row = st.container(horizontal=True)
+    filters_row = st.columns(
+        (2, 1),
+        gap="medium",
+    )
+    card_row = st.container(horizontal=True, gap="medium")
     chart_row = st.container()
     preview_row = st.container()
 
 title_row.title("Movie Analytics Dashboard")
 
-with greeting_row:
-    st.text_input("Enter name", width=250, key="name")
+with greeting_row[0]:
+    st.text_input("Enter name", width="stretch", key="name")
+with greeting_row[1]:
     if not st.session_state.name:
         st.markdown("Enter name", width="content")
     else:
         st.markdown(f"Hello {st.session_state.name}!", width="content")
 
-with filters_row:
-    periods = get_periods()
-    content_types=("movie", "show")
+with filters_row[0]:
     st.selectbox("Select Period: ", periods, 0, width="stretch", key="selected_period")
+with filters_row[1]:
     st.radio(
         "Select Type",
         content_types,
         0,
         format_func=str.capitalize,
-        width=300,
+        width="stretch",
         key="selected_content_type",
     )
 
@@ -75,7 +81,7 @@ with chart_row:
     st.plotly_chart(
         fig,
         on_select="rerun",
-        selection_mode="lasso",
+        selection_mode=["box", "lasso"],
         key="selected_points",
     )
 
@@ -85,9 +91,4 @@ data_preview = preview_data(
     [p["hovertext"] for p in st.session_state.selected_points["selection"]["points"]],
 )
 
-if data_preview.is_empty():
-    st.info(
-        "Lasso select titles (25 max) to see detail", width=400, icon=":material/info:"
-    )
-else:
-    preview_row.dataframe(data_preview)
+preview_row.dataframe(data_preview)
