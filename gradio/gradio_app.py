@@ -90,6 +90,7 @@ with gr.Blocks(css=css) as demo:
         selected_content_type = gr.Radio(
             content_types,
             value=content_types[0],
+            label="Select Content:",
             interactive=True,
             scale=1,
         )
