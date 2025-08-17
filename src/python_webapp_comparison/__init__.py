@@ -119,10 +119,10 @@ def preview_data(period: str, content_type: str, titles: List[str]):
 
 
 def get_periods():
-    return _data.get_column("report").unique().sort(descending=True)
+    return _data.get_column("report").unique().sort(descending=True).to_list()
 
 def get_content_types():
-    return ["movie", "show"]
+    return _data.get_column("type").unique().sort(descending=False).to_list()
 
 def get_num_elements(period: str, content_type: str):
     n_movies = (

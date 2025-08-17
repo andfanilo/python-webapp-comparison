@@ -11,7 +11,7 @@ from shiny import reactive
 from shiny.express import module, input, render, ui
 from shinywidgets import render_plotly
 
-periods = get_periods().to_list()
+periods = get_periods()
 content_types = get_content_types()
 
 ################################################

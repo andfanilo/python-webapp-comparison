@@ -11,7 +11,7 @@ from nicegui import binding
 from nicegui import html
 from nicegui import ui
 
-periods = get_periods().to_list()
+periods = get_periods()
 content_types = get_content_types()
 
 ################################################

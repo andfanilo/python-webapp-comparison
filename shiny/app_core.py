@@ -74,7 +74,7 @@ filters_row = ui.layout_columns(
     ui.input_select(
         "selected_period",
         "Select period",
-        get_periods().to_list(),
+        get_periods(),
         width="100%",
     ),
     ui.input_radio_buttons(

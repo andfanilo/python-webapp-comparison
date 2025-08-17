@@ -8,7 +8,7 @@ from python_webapp_comparison import preview_data
 
 from dash import Dash, html, dcc, callback, Output, Input, dash_table
 
-periods = get_periods().to_list()
+periods = get_periods()
 content_types = get_content_types()
 
 ################################################

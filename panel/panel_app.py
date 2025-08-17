@@ -8,7 +8,7 @@ from python_webapp_comparison import preview_data
 
 import panel as pn
 
-periods = get_periods().to_list()
+periods = get_periods()
 content_types = get_content_types()
 
 ################################################

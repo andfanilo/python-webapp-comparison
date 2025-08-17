@@ -8,7 +8,7 @@ from python_webapp_comparison import preview_data
 
 import solara
 
-periods = get_periods().to_list()
+periods = get_periods()
 content_types = get_content_types()
 
 

@@ -82,7 +82,7 @@ with gr.Blocks(css=css) as demo:
 
     with filters_row:
         selected_period = gr.Dropdown(
-            periods.to_list(),
+            periods,
             value=periods[0],
             label="Select period:",
             interactive=True,
