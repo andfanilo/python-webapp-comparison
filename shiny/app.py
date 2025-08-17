@@ -1,3 +1,4 @@
+from python_webapp_comparison import get_content_types
 from python_webapp_comparison import get_hours_watch
 from python_webapp_comparison import get_num_elements
 from python_webapp_comparison import get_num_views
@@ -11,7 +12,7 @@ from shiny.express import module, input, render, ui
 from shinywidgets import render_plotly
 
 periods = get_periods().to_list()
-content_types = ["movie", "show"]
+content_types = get_content_types()
 
 ################################################
 ### STATE

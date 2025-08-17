@@ -1,4 +1,5 @@
 import plotly.graph_objects as go
+from python_webapp_comparison import get_content_types
 from python_webapp_comparison import get_hours_watch
 from python_webapp_comparison import get_num_elements
 from python_webapp_comparison import get_num_views
@@ -79,7 +80,7 @@ filters_row = ui.layout_columns(
     ui.input_radio_buttons(
         "selected_content_type",
         "Select Type",
-        ("movie", "show"),
+        get_content_types(),
     ),
     col_widths=(8, 4),
     gap="2rem",

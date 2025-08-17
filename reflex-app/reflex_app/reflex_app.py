@@ -5,6 +5,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 import plotly.io as pio
 import reflex as rx
+from python_webapp_comparison import get_content_types
 from python_webapp_comparison import get_hours_watch
 from python_webapp_comparison import get_num_elements
 from python_webapp_comparison import get_num_views
@@ -13,7 +14,7 @@ from python_webapp_comparison import plot_velocity_plotly
 from python_webapp_comparison import preview_data
 
 periods = get_periods()
-content_types = ["movie", "show"]
+content_types = get_content_types()
 
 ################################################
 ### STATE
