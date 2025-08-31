@@ -25,6 +25,9 @@ dependencies = [
     "solara>=1.51.0",
     "streamlit>=1.48.0",
     "watchfiles>=1.1.0",
+    "trame>=3.12",
+    "trame-plotly",
+    "trame-vuetify",
 ]
 
 [build-system]
