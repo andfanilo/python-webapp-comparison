@@ -20,6 +20,8 @@ uv run panel serve --dev panel/panel_app.py
 uv run nicegui/nicegui_app.py
 uv run solara run solara/sol.py
 uv run dash/dash_app.py
+uv run trame/trame_app.py
+uv run trame/trame_vuetify_app.py
 
 cd reflex-app
 uv run reflex run
