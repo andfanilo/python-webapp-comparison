@@ -30,6 +30,7 @@ class MovieDashboard(TrameApp):
         self.state.hours_watched = 0
         self.state.colums = []
         self.state.rows = []
+        self.state.selected_titles = []
 
         self._build_ui()
 
@@ -95,7 +96,10 @@ class MovieDashboard(TrameApp):
 
             # Chart
             with html.Div(style="position: relative; height: 40vh;"):
-                self.ctrl.update_fig = plotly.Figure().update
+                self.ctrl.update_fig = plotly.Figure(
+                    deselect="selected_titles = []",
+                    selected="selected_titles = $event?.points.map((v) => v.hovertext) || []",
+                ).update
 
             # Table
             with html.Div(style="max-height: 40vh; max-width: 100vw; overflow: auto;"):
@@ -107,8 +111,8 @@ class MovieDashboard(TrameApp):
                             "{{ row[col] }}", v_for="col, cidx in colums", key="cidx"
                         )
 
-    @change("period", "content_type")
-    def _on_selection_change(self, period, content_type, **_):
+    @change("period", "content_type", "selected_titles")
+    def _on_selection_change(self, period, content_type, selected_titles, **_):
         # update figure
         fig = plot_velocity_plotly(period, content_type)
         fig.update_layout(template="plotly_white")
@@ -120,9 +124,6 @@ class MovieDashboard(TrameApp):
         self.state.hours_watched = get_hours_watch(period, content_type)
 
         # update Table
-        selected_titles = []
-        # if selected_points:
-        #     selected_titles = [p["hovertext"] for p in selected_points["points"]]
         df = preview_data(
             period,
             content_type,
@@ -132,6 +133,7 @@ class MovieDashboard(TrameApp):
         self.state.rows = [
             {
                 **entry,
+                # !Timestamp is not serializable by json
                 "last_report_date": entry["last_report_date"].strftime("%Y-%m-%d"),
             }
             for entry in df.to_pandas().to_dict("records")
